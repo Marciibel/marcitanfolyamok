@@ -29,6 +29,7 @@
             flex-direction: column;
         }
 
+        /* ── MODAL ── */
         .modal-overlay {
             position: fixed; inset: 0;
             background: rgba(0,0,0,0.85);
@@ -110,6 +111,7 @@
         .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; margin: 12px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
+        /* ── LAYOUT ── */
         header {
             display: flex; align-items: center; justify-content: space-between;
             padding: 0 32px; height: 60px;
@@ -135,6 +137,7 @@
 
         .app-body { display: flex; flex: 1; }
 
+        /* ── SIDEBAR ── */
         aside {
             width: 260px; min-height: calc(100vh - 60px);
             background: var(--card); border-right: 1px solid var(--border);
@@ -153,6 +156,7 @@
         .nav-item.active { background: var(--primary-glow); color: var(--primary); }
         .nav-item .icon { width: 18px; text-align: center; }
 
+        /* ── MAIN ── */
         main { flex: 1; padding: 32px; overflow-y: auto; }
         .page { display: none; }
         .page.active { display: block; }
@@ -233,6 +237,7 @@
 </head>
 <body>
 
+<!-- AUTH MODAL -->
 <div id="auth-modal" class="modal-overlay">
     <div class="modal-box">
         <h2 id="modal-title">Bejelentkezés</h2>
@@ -268,6 +273,7 @@
     </div>
 </div>
 
+<!-- HEADER -->
 <header>
     <div class="logo">Marci<span>.</span>Tanfolyam</div>
     <div id="user-chip-area" class="hidden">
@@ -281,6 +287,7 @@
 </header>
 
 <div class="app-body">
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden">
         <div class="sidebar-label">Navigáció</div>
         <button class="nav-item active" id="nav-courses" onclick="showPage('courses')">
@@ -305,8 +312,10 @@
         </div>
     </aside>
 
+    <!-- MAIN -->
     <main id="main-content" class="hidden">
 
+        <!-- KURZUSOK -->
         <div id="page-courses" class="page active">
             <h1>Kurzusok</h1>
             <p class="subtitle">Válassz egy kurzust a tanuláshoz.</p>
@@ -315,6 +324,7 @@
             </div>
         </div>
 
+        <!-- VIDEÓ LEJÁTSZÓ -->
         <div id="page-player" class="page">
             <button class="btn btn-outline btn-sm" style="margin-bottom:20px;" onclick="showPage('courses')">← Vissza</button>
             <h1 id="player-title"></h1>
@@ -331,6 +341,7 @@
             <div id="lesson-list-player" style="margin-top:24px;"></div>
         </div>
 
+        <!-- PROFIL -->
         <div id="page-profile" class="page">
             <h1>Profil</h1>
             <div class="admin-card" style="max-width:480px;">
@@ -351,6 +362,7 @@
             </div>
         </div>
 
+        <!-- KURZUS LÉTREHOZÁSA -->
         <div id="page-create-course" class="page">
             <h1>Új kurzus létrehozása</h1>
             <p class="subtitle">Töltsd ki az adatokat és add hozzá a leckéket.</p>
@@ -369,8 +381,10 @@
                     <label>Leírás</label>
                     <textarea id="nc-desc" rows="3" placeholder="Mire tanítja meg a hallgatót?"></textarea>
                 </div>
+
                 <h2>Leckék</h2>
                 <ul class="lesson-list-editor" id="lesson-list-editor"></ul>
+
                 <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px;">
                     <div class="form-row">
                         <div class="form-group" style="margin-bottom:0;">
@@ -384,24 +398,29 @@
                     </div>
                     <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="addLesson()">+ Lecke hozzáadása</button>
                 </div>
+
                 <button class="btn btn-primary" onclick="saveCourse()">💾 Kurzus mentése</button>
                 <p class="success-msg" id="nc-msg"></p>
             </div>
         </div>
 
+        <!-- KURZUSOK KEZELÉSE -->
         <div id="page-manage-courses" class="page">
             <h1>Kurzusok kezelése</h1>
             <p class="subtitle">Meglévő kurzusok szerkesztése és törlése.</p>
             <div id="manage-courses-list"></div>
         </div>
 
+        <!-- FELHASZNÁLÓK -->
         <div id="page-manage-users" class="page">
             <h1>Felhasználók</h1>
             <p class="subtitle">Regisztrált felhasználók listája.</p>
             <div class="admin-card">
                 <table>
                     <thead>
-                        <tr><th>Név</th><th>E-mail</th><th>Szerep</th><th>Regisztrálva</th></tr>
+                        <tr>
+                            <th>Név</th><th>E-mail</th><th>Szerep</th><th>Regisztrálva</th>
+                        </tr>
                     </thead>
                     <tbody id="users-table-body">
                         <tr><td colspan="4" style="color:var(--muted);">Betöltés...</td></tr>
@@ -447,7 +466,7 @@ let ytPlayer = null;
 let currentCourse = null;
 let currentLessonIdx = 0;
 let ytReady = false;
-let firestoreWritePromise = null;
+let uiReady = false; // megakadályozza hogy az onAuthStateChanged felülírja a regisztrációt
 
 window.switchTab = (tab) => {
     document.getElementById('tab-login').classList.toggle('hidden', tab !== 'login');
@@ -463,6 +482,40 @@ window.toggleTesterArea = () => {
 };
 
 function setErr(msg) { document.getElementById('auth-error').innerText = msg; }
+
+// ── FŐ UI SETUP – ezt hívjuk login és regisztráció után is ──
+async function setupUI(user, userData) {
+    uiReady = true;
+    currentUser = user;
+    isTester = userData.role === 'tester';
+
+    document.getElementById('auth-modal').classList.add('hidden');
+    document.getElementById('sidebar').classList.remove('hidden');
+    document.getElementById('main-content').classList.remove('hidden');
+    document.getElementById('user-chip-area').classList.remove('hidden');
+
+    const avatar = user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`;
+    document.getElementById('header-avatar').src = avatar;
+    document.getElementById('header-name').innerText = userData.name || user.displayName || user.email;
+    document.getElementById('header-tester-badge').classList.toggle('hidden', !isTester);
+
+    document.getElementById('profile-avatar').src = avatar;
+    document.getElementById('profile-name').innerText = userData.name || user.displayName || 'Névtelen';
+    document.getElementById('profile-email').innerText = user.email;
+    document.getElementById('profile-role').innerHTML = isTester
+        ? '<span class="tag tag-tester">🔑 Teszter</span>'
+        : '<span class="tag tag-user">Felhasználó</span>';
+
+    if (isTester) document.getElementById('tester-nav').classList.remove('hidden');
+
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+    }
+
+    loadCourses();
+}
 
 window.doLogin = async () => {
     const email = document.getElementById('login-email').value.trim();
@@ -484,11 +537,12 @@ window.doRegister = async () => {
     try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         await updateProfile(cred.user, { displayName: name });
-        firestoreWritePromise = setDoc(doc(db, "users", cred.user.uid), {
-            name, email, role, createdAt: new Date().toISOString()
-        });
-        await firestoreWritePromise;
-        firestoreWritePromise = null;
+
+        const userData = { name, email, role, createdAt: new Date().toISOString() };
+
+        // Firestore írás ELŐBB, setupUI UTÁNA – az onAuthStateChanged le van tiltva (uiReady=true)
+        await setDoc(doc(db, "users", cred.user.uid), userData);
+        await setupUI(cred.user, userData);
     } catch(e) {
         setErr(e.code === 'auth/email-already-in-use' ? 'Ez az e-mail már regisztrált.' : e.message);
     }
@@ -507,44 +561,19 @@ window.doGoogle = async () => {
                 createdAt: new Date().toISOString()
             });
         }
+        // Google loginnál az onAuthStateChanged kezeli
     } catch(e) { setErr(e.message); }
 };
 
 window.doLogout = async () => { await signOut(auth); location.reload(); };
 
+// ── AUTH STATE – csak login és oldalbetöltés esetén fut le ──
 onAuthStateChanged(auth, async (user) => {
+    if (uiReady) return; // regisztráció már beállította az UI-t, nem kell újra
     if (user) {
-        if (firestoreWritePromise) await firestoreWritePromise;
-
-        currentUser = user;
-        document.getElementById('auth-modal').classList.add('hidden');
-        document.getElementById('sidebar').classList.remove('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
-        document.getElementById('user-chip-area').classList.remove('hidden');
-
         const snap = await getDoc(doc(db, "users", user.uid));
-        const userData = snap.exists() ? snap.data() : {};
-        isTester = userData.role === 'tester';
-
-        const avatar = user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`;
-        document.getElementById('header-avatar').src = avatar;
-        document.getElementById('header-name').innerText = user.displayName || user.email;
-        document.getElementById('header-tester-badge').classList.toggle('hidden', !isTester);
-
-        document.getElementById('profile-avatar').src = avatar;
-        document.getElementById('profile-name').innerText = user.displayName || 'Névtelen';
-        document.getElementById('profile-email').innerText = user.email;
-        document.getElementById('profile-role').innerHTML = isTester
-            ? '<span class="tag tag-tester">🔑 Teszter</span>'
-            : '<span class="tag tag-user">Felhasználó</span>';
-
-        if (isTester) document.getElementById('tester-nav').classList.remove('hidden');
-
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        document.head.appendChild(tag);
-
-        loadCourses();
+        const userData = snap.exists() ? snap.data() : { role: 'user', name: user.displayName || user.email };
+        await setupUI(user, userData);
     } else {
         document.getElementById('auth-modal').classList.remove('hidden');
         document.getElementById('sidebar').classList.add('hidden');
@@ -553,6 +582,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+// ── NAVIGATION ──
 window.showPage = (page) => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page).classList.add('active');
@@ -563,6 +593,7 @@ window.showPage = (page) => {
     if (page === 'manage-courses') loadManageCourses();
 };
 
+// ── COURSES ──
 async function loadCourses() {
     const grid = document.getElementById('courses-grid');
     grid.innerHTML = '';
@@ -586,7 +617,7 @@ async function loadCourses() {
             grid.appendChild(card);
         });
     } catch(e) {
-        grid.innerHTML = `<div style="color:#f87171;">Hiba: ${e.message}</div>`;
+        grid.innerHTML = `<div style="color:#f87171;">Hiba a kurzusok betöltésekor: ${e.message}</div>`;
     }
 }
 
@@ -618,6 +649,7 @@ function loadLesson(idx) {
             createPlayer(lesson.videoId);
         }
     }
+    // else: onYouTubeIframeAPIReady will handle it
 }
 
 function createPlayer(videoId) {
@@ -628,7 +660,7 @@ function createPlayer(videoId) {
         playerVars: { enablejsapi: 1, origin: location.origin, rel: 0 },
         events: {
             onError: () => {
-                document.getElementById('player-status').innerText = '⚠️ Ez a videó nem játszható le beágyazva.';
+                document.getElementById('player-status').innerText = '⚠️ Ez a videó nem játszható le beágyazva. Ellenőrizd a Video ID-t.';
                 document.getElementById('next-lesson-btn').disabled = false;
             },
             onStateChange: (e) => {
@@ -672,6 +704,7 @@ window.nextLesson = () => {
     }
 };
 
+// ── TESTER: KURZUS LÉTREHOZÁS ──
 window.addLesson = () => {
     const title = document.getElementById('nl-title').value.trim();
     const videoId = document.getElementById('nl-video').value.trim();
@@ -723,6 +756,7 @@ window.saveCourse = async () => {
     } catch(e) { alert('Hiba: ' + e.message); }
 };
 
+// ── TESTER: KURZUSOK KEZELÉSE ──
 async function loadManageCourses() {
     const container = document.getElementById('manage-courses-list');
     container.innerHTML = '<div style="color:var(--muted);">Betöltés...</div>';
@@ -756,6 +790,7 @@ window.deleteCourse = async (id, btn) => {
     loadManageCourses(); loadCourses();
 };
 
+// ── TESTER: FELHASZNÁLÓK ──
 async function loadUsers() {
     const tbody = document.getElementById('users-table-body');
     tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">Betöltés...</td></tr>';
@@ -778,6 +813,7 @@ async function loadUsers() {
     }
 }
 
+// ── PROFIL ──
 window.saveProfileName = async () => {
     const name = document.getElementById('profile-new-name').value.trim();
     if (!name) return;
