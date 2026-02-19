@@ -1,1147 +1,1332 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marci Tanfolyama</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #080c14; --card: #0f1623; --card2: #151d2e; --border: #1e2d45;
-            --primary: #3b82f6; --primary-glow: rgba(59,130,246,0.15);
-            --accent: #06d6a0; --danger: #ef4444;
-            --text: #e2e8f0; --muted: #64748b; --tester: #f59e0b;
-            --warn: #f59e0b;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marci Tanfolyama</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080c14;--card:#0f1623;--card2:#151d2e;--border:#1e2d45;
+  --primary:#3b82f6;--pglow:rgba(59,130,246,.15);
+  --accent:#06d6a0;--danger:#ef4444;
+  --text:#e2e8f0;--muted:#64748b;
+  --tester:#f59e0b;--premium:#a855f7;--premglow:rgba(168,85,247,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .modal-overlay.hidden { display: none !important; }
-        .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 360px; animation: popIn .3s cubic-bezier(.175,.885,.32,1.275); }
-        @keyframes popIn { from { opacity:0; transform:scale(.92) translateY(10px); } to { opacity:1; transform:none; } }
-        .modal-box h2 { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 40%, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tabs { display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 4px; margin-bottom: 1.5rem; }
-        .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; transition: .2s; }
-        .tab-btn.active { background: var(--card2); color: var(--text); }
-        .tester-section { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
-        .tester-toggle { display: flex; align-items: center; gap: 8px; color: var(--tester); font-size: 13px; cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; font-weight: 500; padding: 6px 0; }
-        .tester-toggle::before { content: '🔑'; }
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.modal-overlay.hidden{display:none!important;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:min(380px,95vw);animation:popIn .3s cubic-bezier(.175,.885,.32,1.275);}
+.modal-box.wide{width:min(520px,95vw);}
+@keyframes popIn{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:none}}
+.modal-box h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:1.4rem;background:linear-gradient(135deg,#fff 40%,var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:8px;padding:4px;margin-bottom:1.4rem;}
+.tab-btn{flex:1;padding:8px;border:none;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:.2s;}
+.tab-btn.active{background:var(--card2);color:var(--text);}
+.tester-section{margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;}
+.tester-toggle{color:var(--tester);font-size:13px;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;font-weight:500;padding:6px 0;}
+.tester-toggle::before{content:'🔑 ';}
 
-        /* INPUTS & BUTTONS */
-        input[type=text], input[type=email], input[type=password], input[type=search] {
-            width: 100%; padding: 11px 14px; background: var(--bg); color: var(--text);
-            border: 1px solid var(--border); border-radius: 8px;
-            font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color .2s; margin-bottom: 10px;
-        }
-        input:focus { border-color: var(--primary); }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: .2s; margin-top: 4px; }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-google { background: #fff; color: #111; }
-        .btn-google:hover { background: #f0f0f0; }
-        .btn-danger { background: var(--danger); color: #fff; font-size: 13px; padding: 8px; }
-        .btn-sm { padding: 7px 14px; font-size: 13px; border-radius: 6px; width: auto; margin-top: 0; }
-        .btn-accent { background: var(--accent); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
-        .btn:disabled { opacity: .45; cursor: not-allowed; }
-        .err-msg { color: #f87171; font-size: 13px; min-height: 18px; margin-top: 6px; }
-        .success-msg { color: var(--accent); font-size: 13px; min-height: 18px; margin-top: 4px; }
-        .divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; margin: 12px 0; }
-        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* INPUTS */
+input[type=text],input[type=email],input[type=password],input[type=search]{width:100%;padding:11px 14px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:10px;}
+input:focus{border-color:var(--primary);}
+textarea,select{width:100%;padding:10px 12px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;resize:vertical;}
+textarea:focus,select:focus{border-color:var(--primary);}
+select option{background:var(--card);}
 
-        /* LAYOUT */
-        header { display: flex; align-items: center; justify-content: space-between; padding: 0 32px; height: 60px; border-bottom: 1px solid var(--border); background: rgba(8,12,20,.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
-        .logo { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; }
-        .logo span { color: var(--primary); }
-        .user-chip { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 100px; padding: 5px 14px 5px 5px; }
-        .user-chip img { width: 32px; height: 32px; border-radius: 50%; }
-        .tester-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; background: rgba(245,158,11,.2); color: var(--tester); border-radius: 4px; padding: 2px 6px; letter-spacing: .05em; }
-        .app-body { display: flex; flex: 1; }
+/* BUTTONS */
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;margin-top:4px;}
+.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:#2563eb;}
+.btn-google{background:#fff;color:#111;}.btn-google:hover{background:#f0f0f0;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+.btn-premium{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;}.btn-premium:hover{opacity:.9;}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:6px;width:auto;margin-top:0;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:12px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.err-msg{color:#f87171;font-size:13px;min-height:18px;margin-top:6px;}
+.success-msg{color:var(--accent);font-size:13px;min-height:18px;margin-top:4px;}
 
-        /* SIDEBAR */
-        aside { width: 260px; min-height: calc(100vh - 60px); background: var(--card); border-right: 1px solid var(--border); padding: 24px 16px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
-        .sidebar-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; padding: 8px 10px 4px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--muted); transition: .15s; border: none; background: none; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
-        .nav-item:hover { background: var(--card2); color: var(--text); }
-        .nav-item.active { background: var(--primary-glow); color: var(--primary); }
-        .tester-glow { background: linear-gradient(135deg, rgba(245,158,11,.08), transparent); border: 1px solid rgba(245,158,11,.2); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; color: var(--tester); }
+/* LAYOUT */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:60px;border-bottom:1px solid var(--border);background:rgba(8,12,20,.9);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;}
+.logo span{color:var(--primary);}
+.user-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:100px;padding:5px 14px 5px 5px;}
+.user-chip img{width:32px;height:32px;border-radius:50%;object-fit:cover;}
+.badge-pill{font-size:10px;font-weight:700;text-transform:uppercase;border-radius:4px;padding:2px 6px;letter-spacing:.05em;}
+.badge-tester{background:rgba(245,158,11,.2);color:var(--tester);}
+.badge-premium{background:rgba(168,85,247,.2);color:var(--premium);}
+.app-body{display:flex;flex:1;}
 
-        /* MAIN */
-        main { flex: 1; padding: 32px; overflow-y: auto; }
-        .page { display: none; }
-        .page.active { display: block; }
-        h1 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
-        h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: 16px; }
-        .subtitle { color: var(--muted); margin-bottom: 28px; font-size: 15px; }
+/* SIDEBAR */
+aside{width:260px;min-height:calc(100vh - 60px);background:var(--card);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;}
+.sidebar-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:.15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:var(--pglow);color:var(--primary);}
+.tester-glow{background:linear-gradient(135deg,rgba(245,158,11,.08),transparent);border:1px solid rgba(245,158,11,.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:13px;color:var(--tester);}
+.premium-glow{background:linear-gradient(135deg,rgba(168,85,247,.08),transparent);border:1px solid rgba(168,85,247,.25);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:13px;color:var(--premium);}
 
-        /* SEARCH */
-        .search-bar { position: relative; max-width: 400px; margin-bottom: 24px; }
-        .search-bar input { padding-left: 40px; margin-bottom: 0; }
-        .search-bar::before { content: '🔍'; position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 14px; pointer-events: none; }
+/* MAIN */
+main{flex:1;padding:32px;overflow-y:auto;}
+.page{display:none;}.page.active{display:block;}
+h1{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;margin-bottom:8px;}
+h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:16px;}
+.subtitle{color:var(--muted);margin-bottom:28px;font-size:15px;}
 
-        /* COURSE GRID */
-        .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .course-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform .2s, border-color .2s; }
-        .course-card:hover { transform: translateY(-3px); border-color: var(--primary); }
-        .course-thumb { height: 140px; background: linear-gradient(135deg, var(--card2), var(--border)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
-        .course-info { padding: 16px 16px 8px; }
-        .course-title { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 4px; }
-        .course-meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
-        .course-progress-wrap { padding: 0 16px 8px; }
-        .course-progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-        .course-actions { display: flex; gap: 8px; padding: 8px 16px 16px; }
+/* SEARCH */
+.search-bar{position:relative;max-width:420px;margin-bottom:24px;}
+.search-bar input{padding-left:40px;margin-bottom:0;}
+.search-bar::before{content:'🔍';position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;}
 
-        /* PROGRESS BAR */
-        .progress-bar { height: 5px; background: var(--border); border-radius: 3px; }
-        .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width .5s; }
-        .progress-fill.complete { background: #22c55e; }
+/* COURSE GRID */
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.course-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s;}
+.course-card:hover{transform:translateY(-3px);border-color:var(--primary);}
+.course-card.premium-card{border-color:rgba(168,85,247,.3);}
+.course-card.premium-card:hover{border-color:var(--premium);}
+.course-thumb{height:140px;background:linear-gradient(135deg,var(--card2),var(--border));display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative;}
+.premium-lock{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.course-info{padding:14px 16px 6px;}
+.course-title{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:3px;}
+.course-meta{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.course-creator{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-bottom:8px;cursor:pointer;}
+.course-creator:hover{color:var(--primary);}
+.course-creator img{width:18px;height:18px;border-radius:50%;object-fit:cover;}
+.course-progress-wrap{padding:0 16px 6px;}
+.course-progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px;}
+.course-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 14px;}
+.like-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:13px;color:var(--muted);transition:.2s;font-family:'DM Sans',sans-serif;}
+.like-btn:hover{border-color:#ef4444;color:#ef4444;}
+.like-btn.liked{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,.08);}
 
-        /* VIDEO PLAYER */
-        .video-wrapper { width: 100%; max-width: 860px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 24px; }
-        .video-wrapper > div { width: 100% !important; height: 100% !important; }
+/* PROGRESS */
+.progress-bar{height:5px;background:var(--border);border-radius:3px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s;}
+.progress-fill.complete{background:#22c55e;}
 
-        /* QUIZ */
-        .quiz-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 8000; }
-        .quiz-overlay.hidden { display: none !important; }
-        .quiz-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem; width: min(560px, 95vw); max-height: 90vh; overflow-y: auto; animation: popIn .3s cubic-bezier(.175,.885,.32,1.275); }
-        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .quiz-counter { font-size: 13px; color: var(--muted); }
-        .quiz-progress { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 28px; }
-        .quiz-progress-fill { height: 100%; background: var(--primary); border-radius: 2px; transition: width .4s; }
-        .quiz-question { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; line-height: 1.5; }
-        .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-        .quiz-option {
-            padding: 13px 16px; border: 1px solid var(--border); border-radius: 10px;
-            background: var(--bg); cursor: pointer; font-family: 'DM Sans', sans-serif;
-            font-size: 14px; text-align: left; color: var(--text); transition: .2s;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .quiz-option:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-glow); }
-        .quiz-option.correct { border-color: var(--accent) !important; background: rgba(6,214,160,.1) !important; color: var(--accent); }
-        .quiz-option.wrong { border-color: var(--danger) !important; background: rgba(239,68,68,.1) !important; color: var(--danger); }
-        .quiz-option .opt-label { width: 24px; height: 24px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-        .quiz-feedback { padding: 12px 16px; border-radius: 8px; font-size: 14px; margin-bottom: 16px; }
-        .quiz-feedback.correct { background: rgba(6,214,160,.1); color: var(--accent); border: 1px solid rgba(6,214,160,.3); }
-        .quiz-feedback.wrong { background: rgba(239,68,68,.1); color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+/* VIDEO */
+.video-wrapper{width:100%;max-width:860px;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:24px;}
+.video-wrapper>div{width:100%!important;height:100%!important;}
 
-        /* QUIZ RESULT */
-        .quiz-result { text-align: center; padding: 1rem 0; }
-        .quiz-score-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; font-family: 'Syne', sans-serif; }
-        .quiz-score-circle.pass { background: rgba(6,214,160,.15); border: 3px solid var(--accent); }
-        .quiz-score-circle.fail { background: rgba(239,68,68,.1); border: 3px solid var(--danger); }
-        .quiz-score-num { font-size: 1.8rem; font-weight: 800; }
-        .quiz-score-circle.pass .quiz-score-num { color: var(--accent); }
-        .quiz-score-circle.fail .quiz-score-num { color: var(--danger); }
+/* QUIZ */
+.quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:8000;}
+.quiz-overlay.hidden{display:none!important;}
+.quiz-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:min(560px,95vw);max-height:90vh;overflow-y:auto;animation:popIn .3s cubic-bezier(.175,.885,.32,1.275);}
+.quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.quiz-counter{font-size:13px;color:var(--muted);}
+.quiz-progress{height:3px;background:var(--border);border-radius:2px;margin-bottom:28px;}
+.quiz-progress-fill{height:100%;background:var(--primary);border-radius:2px;transition:width .4s;}
+.quiz-question{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:20px;line-height:1.5;}
+.quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.quiz-option{padding:13px 16px;border:1px solid var(--border);border-radius:10px;background:var(--bg);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;text-align:left;color:var(--text);transition:.2s;display:flex;align-items:center;gap:10px;}
+.quiz-option:hover:not(:disabled){border-color:var(--primary);background:var(--pglow);}
+.quiz-option.correct{border-color:var(--accent)!important;background:rgba(6,214,160,.1)!important;color:var(--accent);}
+.quiz-option.wrong{border-color:var(--danger)!important;background:rgba(239,68,68,.1)!important;color:var(--danger);}
+.quiz-option .opt-label{width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.quiz-feedback{padding:12px 16px;border-radius:8px;font-size:14px;margin-bottom:16px;}
+.quiz-feedback.correct{background:rgba(6,214,160,.1);color:var(--accent);border:1px solid rgba(6,214,160,.3);}
+.quiz-feedback.wrong{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);}
+.quiz-result{text-align:center;padding:1rem 0;}
+.quiz-score-circle{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Syne',sans-serif;}
+.quiz-score-circle.pass{background:rgba(6,214,160,.15);border:3px solid var(--accent);}
+.quiz-score-circle.fail{background:rgba(239,68,68,.1);border:3px solid var(--danger);}
+.quiz-score-num{font-size:1.8rem;font-weight:800;}
+.quiz-score-circle.pass .quiz-score-num{color:var(--accent);}
+.quiz-score-circle.fail .quiz-score-num{color:var(--danger);}
 
-        /* ADMIN CARDS */
-        .admin-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color .2s; resize: vertical; }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary); }
-        .form-group select option { background: var(--card); }
-        .lesson-list-editor { list-style: none; }
-        .lesson-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
-        .lesson-item span { flex: 1; font-size: 14px; }
-        .lesson-num { width: 24px; height: 24px; border-radius: 50%; background: var(--primary-glow); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px 12px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; border-bottom: 1px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-        tr:last-child td { border-bottom: none; }
-        .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
-        .tag-tester { background: rgba(245,158,11,.15); color: var(--tester); }
-        .tag-user { background: rgba(100,116,139,.15); color: var(--muted); }
+/* ADMIN */
+.admin-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;}
+.lesson-list-editor{list-style:none;}
+.lesson-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;}
+.lesson-item span{flex:1;font-size:14px;}
+.lesson-num{width:24px;height:24px;border-radius:50%;background:var(--pglow);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;padding:10px 12px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
+td{padding:12px;border-bottom:1px solid var(--border);font-size:14px;}
+tr:last-child td{border-bottom:none;}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;}
+.tag-tester{background:rgba(245,158,11,.15);color:var(--tester);}
+.tag-premium{background:rgba(168,85,247,.15);color:var(--premium);}
+.tag-user{background:rgba(100,116,139,.15);color:var(--muted);}
 
-        .hidden { display: none !important; }
+/* BADGE POPUP */
+.badge-popup{position:fixed;bottom:32px;right:32px;background:var(--card);border:1px solid var(--tester);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;z-index:9500;box-shadow:0 8px 32px rgba(0,0,0,.6);max-width:320px;animation:slideUp .4s cubic-bezier(.175,.885,.32,1.275);}
+.badge-popup.hidden{display:none!important;}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.badge-popup-visual{width:64px;height:64px;border-radius:50%;border:3px solid var(--tester);flex-shrink:0;overflow:hidden;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:2rem;}
+.badge-popup-visual img{width:100%;height:100%;object-fit:cover;}
 
-        /* BADGE UNLOCK POPUP */
-        .badge-popup { position: fixed; bottom: 32px; right: 32px; background: var(--card); border: 1px solid var(--tester); border-radius: 16px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; z-index: 9500; box-shadow: 0 8px 32px rgba(0,0,0,.6); max-width: 320px; }
-        .badge-popup.hidden { display: none !important; }
-        .badge-popup-anim { animation: slideUp .4s cubic-bezier(.175,.885,.32,1.275); }
-        @keyframes slideUp { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform:none; } }
-        .badge-popup-visual { width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--tester); flex-shrink: 0; overflow: hidden; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .badge-popup-visual img { width: 100%; height: 100%; object-fit: cover; }
+/* AVATAR GALLERY */
+.avatar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:14px;margin-top:16px;}
+.avatar-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+.avatar-item:hover .avatar-visual{transform:scale(1.08);border-color:var(--primary);}
+.avatar-visual{width:72px;height:72px;border-radius:50%;border:3px solid var(--border);overflow:hidden;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:2rem;transition:transform .2s,border-color .2s;}
+.avatar-visual img{width:100%;height:100%;object-fit:cover;}
+.avatar-item.selected .avatar-visual{border-color:var(--primary);box-shadow:0 0 0 4px var(--pglow);}
+.avatar-label{font-size:10px;color:var(--muted);margin-top:5px;text-align:center;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-        /* AVATAR GALLERY */
-        .avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 14px; margin-top: 16px; }
-        .avatar-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .avatar-item:hover .avatar-visual { transform: scale(1.08); border-color: var(--primary); }
-        .avatar-visual { width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--border); overflow: hidden; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: transform .2s, border-color .2s; }
-        .avatar-visual img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-item.selected .avatar-visual { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-glow); }
-        .avatar-label { font-size: 10px; color: var(--muted); margin-top: 5px; text-align: center; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    </style>
+/* PUBLIC PROFILE */
+.pub-profile-header{display:flex;align-items:center;gap:24px;margin-bottom:28px;flex-wrap:wrap;}
+.pub-avatar{width:90px;height:90px;border-radius:50%;border:3px solid var(--primary);object-fit:cover;flex-shrink:0;}
+.pub-stats{display:flex;gap:24px;margin-top:8px;}
+.pub-stat{text-align:center;}
+.pub-stat-num{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;}
+.pub-stat-label{font-size:12px;color:var(--muted);}
+
+/* PREMIUM BANNER */
+.premium-banner{background:linear-gradient(135deg,rgba(168,85,247,.12),rgba(124,58,237,.08));border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+
+.hidden{display:none!important;}
+</style>
 </head>
 <body>
 
 <!-- AUTH MODAL -->
 <div id="auth-modal" class="modal-overlay">
-    <div class="modal-box">
-        <h2 id="modal-title">Bejelentkezés</h2>
-        <div class="tabs">
-            <button class="tab-btn active" id="tab-btn-login" onclick="switchTab('login')">Belépés</button>
-            <button class="tab-btn" id="tab-btn-register" onclick="switchTab('register')">Regisztráció</button>
-        </div>
-        <div id="tab-login">
-            <input type="email" id="login-email" placeholder="E-mail cím">
-            <input type="password" id="login-pass" placeholder="Jelszó">
-            <button class="btn btn-primary" onclick="doLogin()">Belépés</button>
-            <div class="divider">vagy</div>
-            <button class="btn btn-google" onclick="doGoogle()">🔵 Google bejelentkezés</button>
-        </div>
-        <div id="tab-register" class="hidden">
-            <input type="text" id="reg-name" placeholder="Teljes neved">
-            <input type="email" id="reg-email" placeholder="E-mail cím">
-            <input type="password" id="reg-pass" placeholder="Jelszó (min. 6 karakter)">
-            <div class="tester-section">
-                <button class="tester-toggle" onclick="toggleTesterArea()">TESZTER VAGY?</button>
-                <div id="tester-code-area" class="hidden" style="margin-top:8px;">
-                    <input type="text" id="tester-code" placeholder="Add meg a teszter kódot...">
-                </div>
-            </div>
-            <button class="btn btn-primary" style="margin-top:12px;" onclick="doRegister()">Regisztráció</button>
-            <div class="divider">vagy</div>
-            <button class="btn btn-google" onclick="doGoogle()">🔵 Google bejelentkezés</button>
-        </div>
-        <p class="err-msg" id="auth-error"></p>
+  <div class="modal-box">
+    <h2 id="modal-title">Bejelentkezés</h2>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-btn-login" onclick="switchTab('login')">Belépés</button>
+      <button class="tab-btn" id="tab-btn-register" onclick="switchTab('register')">Regisztráció</button>
     </div>
+    <div id="tab-login">
+      <input type="email" id="login-email" placeholder="E-mail cím">
+      <input type="password" id="login-pass" placeholder="Jelszó">
+      <button class="btn btn-primary" onclick="doLogin()">Belépés</button>
+      <div class="divider">vagy</div>
+      <button class="btn btn-google" onclick="doGoogle()">🔵 Google bejelentkezés</button>
+    </div>
+    <div id="tab-register" class="hidden">
+      <input type="text" id="reg-name" placeholder="Teljes neved">
+      <input type="email" id="reg-email" placeholder="E-mail cím">
+      <input type="password" id="reg-pass" placeholder="Jelszó (min. 6 karakter)">
+      <div class="tester-section">
+        <button class="tester-toggle" onclick="toggleTesterArea()">TESZTER VAGY?</button>
+        <div id="tester-code-area" class="hidden" style="margin-top:8px;">
+          <input type="text" id="tester-code" placeholder="Teszter kód...">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:12px;" onclick="doRegister()">Regisztráció</button>
+      <div class="divider">vagy</div>
+      <button class="btn btn-google" onclick="doGoogle()">🔵 Google bejelentkezés</button>
+    </div>
+    <p class="err-msg" id="auth-error"></p>
+  </div>
 </div>
 
 <!-- QUIZ OVERLAY -->
 <div id="quiz-overlay" class="quiz-overlay hidden">
-    <div class="quiz-box">
-        <div id="quiz-question-screen">
-            <div class="quiz-header">
-                <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;">📝 Kvíz</div>
-                <div class="quiz-counter" id="quiz-counter">1 / 5</div>
-            </div>
-            <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
-            <div class="quiz-question" id="quiz-question-text"></div>
-            <div class="quiz-options" id="quiz-options"></div>
-            <div id="quiz-feedback" class="quiz-feedback hidden"></div>
-            <button class="btn btn-primary" id="quiz-next-btn" onclick="quizNext()" style="display:none;">Következő kérdés →</button>
-        </div>
-        <div id="quiz-result-screen" class="hidden quiz-result">
-            <div class="quiz-score-circle" id="quiz-score-circle">
-                <div class="quiz-score-num" id="quiz-score-num"></div>
-                <div style="font-size:12px;color:var(--muted);">pont</div>
-            </div>
-            <h2 id="quiz-result-title" style="margin-bottom:8px;"></h2>
-            <p id="quiz-result-desc" style="color:var(--muted);font-size:14px;margin-bottom:24px;"></p>
-            <button class="btn btn-primary" id="quiz-result-btn" onclick="quizResultAction()"></button>
-        </div>
+  <div class="quiz-box">
+    <div id="quiz-question-screen">
+      <div class="quiz-header">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;">📝 Kvíz</div>
+        <div class="quiz-counter" id="quiz-counter">1 / 5</div>
+      </div>
+      <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+      <div class="quiz-question" id="quiz-question-text"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div id="quiz-feedback" class="quiz-feedback hidden"></div>
+      <button class="btn btn-primary" id="quiz-next-btn" onclick="quizNext()" style="display:none;">Következő →</button>
     </div>
+    <div id="quiz-result-screen" class="hidden quiz-result">
+      <div class="quiz-score-circle" id="quiz-score-circle">
+        <div class="quiz-score-num" id="quiz-score-num"></div>
+        <div style="font-size:12px;color:var(--muted);">pont</div>
+      </div>
+      <h2 id="quiz-result-title" style="margin-bottom:8px;"></h2>
+      <p id="quiz-result-desc" style="color:var(--muted);font-size:14px;margin-bottom:24px;"></p>
+      <button class="btn btn-primary" id="quiz-result-btn" onclick="quizResultAction()"></button>
+    </div>
+  </div>
 </div>
 
-<!-- BADGE UNLOCK POPUP -->
+<!-- BADGE POPUP -->
 <div id="badge-popup" class="badge-popup hidden">
-    <div class="badge-popup-visual" id="badge-popup-visual"></div>
-    <div>
-        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;color:var(--tester);">🏆 Új avatar feloldva!</div>
-        <div id="badge-popup-name" style="font-size:13px;color:var(--text);margin-top:2px;"></div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Profil oldalon állíthatod be.</div>
-    </div>
+  <div class="badge-popup-visual" id="badge-popup-visual"></div>
+  <div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--tester);">🏆 Új avatar feloldva!</div>
+    <div id="badge-popup-name" style="font-size:13px;color:var(--text);margin-top:2px;"></div>
+    <div style="font-size:12px;color:var(--muted);margin-top:2px;">Profilban állíthatod be.</div>
+  </div>
 </div>
 
 <!-- HEADER -->
 <header>
-    <div class="logo">Marci<span>.</span>Tanfolyam</div>
-    <div id="user-chip-area" class="hidden">
-        <div class="user-chip">
-            <img id="header-avatar" src="" alt="">
-            <span id="header-name" style="font-size:14px;"></span>
-            <span id="header-tester-badge" class="tester-badge hidden">Teszter</span>
-            <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 8px;" onclick="doLogout()">Kilépés</button>
-        </div>
+  <div class="logo">Marci<span>.</span>Tanfolyam</div>
+  <div id="user-chip-area" class="hidden">
+    <div class="user-chip">
+      <img id="header-avatar" src="" alt="">
+      <span id="header-name" style="font-size:14px;"></span>
+      <span id="header-tester-badge" class="badge-pill badge-tester hidden">Teszter</span>
+      <span id="header-premium-badge" class="badge-pill badge-premium hidden">💎 Premium</span>
+      <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:0 0 0 8px;" onclick="doLogout()">Ki</button>
     </div>
+  </div>
 </header>
 
 <div class="app-body">
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="hidden">
-        <div class="sidebar-label">Navigáció</div>
-        <button class="nav-item active" id="nav-courses" onclick="showPage('courses')"><span>🎓</span> Kurzusok</button>
-        <button class="nav-item" id="nav-profile" onclick="showPage('profile')"><span>👤</span> Profil</button>
-        <div id="tester-nav" class="hidden" style="margin-top:16px;">
-            <div class="tester-glow">🔑 Teszter panel</div>
-            <div class="sidebar-label">Admin</div>
-            <button class="nav-item" id="nav-create-course" onclick="showPage('create-course')"><span>➕</span> Kurzus létrehozása</button>
-            <button class="nav-item" id="nav-manage-courses" onclick="showPage('manage-courses')"><span>📋</span> Kurzusok kezelése</button>
-            <button class="nav-item" id="nav-manage-users" onclick="showPage('manage-users')"><span>👥</span> Felhasználók</button>
+<!-- SIDEBAR -->
+<aside id="sidebar" class="hidden">
+  <div class="sidebar-label">Navigáció</div>
+  <button class="nav-item active" id="nav-courses" onclick="showPage('courses')"><span>🎓</span> Kurzusok</button>
+  <button class="nav-item" id="nav-profile" onclick="showPage('profile')"><span>👤</span> Profil</button>
+  <button class="nav-item" id="nav-premium" onclick="showPage('premium')"><span>💎</span> Premium</button>
+
+  <div id="creator-nav" class="hidden" style="margin-top:16px;">
+    <div id="creator-nav-label"></div>
+    <div class="sidebar-label">Tartalom</div>
+    <button class="nav-item" id="nav-create-course" onclick="showPage('create-course')"><span>➕</span> Kurzus létrehozása</button>
+    <button class="nav-item" id="nav-manage-courses" onclick="showPage('manage-courses')"><span>📋</span> Kurzusaim</button>
+  </div>
+
+  <div id="tester-nav" class="hidden" style="margin-top:8px;">
+    <div class="tester-glow">🔑 Teszter panel</div>
+    <div class="sidebar-label">Admin</div>
+    <button class="nav-item" id="nav-manage-users" onclick="showPage('manage-users')"><span>👥</span> Felhasználók</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main id="main-content" class="hidden">
+
+  <!-- KURZUSOK -->
+  <div id="page-courses" class="page active">
+    <h1>Kurzusok</h1>
+    <p class="subtitle">Válassz egy kurzust a tanuláshoz.</p>
+    <div class="search-bar"><input type="search" id="course-search" placeholder="Keresés..." oninput="filterCourses()"></div>
+    <div id="courses-grid" class="course-grid"><div style="color:var(--muted);">Betöltés...</div></div>
+  </div>
+
+  <!-- VIDEÓ LEJÁTSZÓ -->
+  <div id="page-player" class="page">
+    <button class="btn btn-outline btn-sm" style="margin-bottom:20px;" onclick="showPage('courses')">← Vissza</button>
+    <h1 id="player-title"></h1>
+    <p class="subtitle" id="player-lesson-name"></p>
+    <div class="video-wrapper"><div id="yt-player"></div></div>
+    <p id="player-status" style="color:var(--muted);font-size:14px;margin-bottom:12px;">Nézd végig a videót!</p>
+    <button id="next-lesson-btn" class="btn btn-accent btn-sm" disabled onclick="nextLesson()">Következő lecke →</button>
+    <div style="margin-top:24px;max-width:860px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;"><span>Haladás</span><span id="player-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div id="lesson-list-player" style="margin-top:24px;"></div>
+  </div>
+
+  <!-- PROFIL (saját) -->
+  <div id="page-profile" class="page">
+    <h1>Profil</h1>
+    <div class="admin-card" style="max-width:560px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+        <img id="profile-avatar" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--primary);object-fit:cover;" src="" alt="">
+        <div>
+          <div id="profile-name" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;"></div>
+          <div id="profile-email" style="color:var(--muted);font-size:13px;"></div>
+          <div id="profile-role" style="margin-top:4px;"></div>
+          <div id="profile-stats" style="margin-top:8px;display:flex;gap:16px;"></div>
         </div>
-    </aside>
+      </div>
+      <div class="form-group"><label>Megjelenített név</label><input type="text" id="profile-new-name" placeholder="Új név"></div>
+      <button class="btn btn-primary btn-sm" onclick="saveProfileName()">Mentés</button>
+      <p class="success-msg" id="profile-save-msg"></p>
+    </div>
+    <div class="admin-card" style="max-width:560px;">
+      <h2>🖼️ Avatar galéria</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:4px;">Kattints egy avatarra a profilképed beállításához.</p>
+      <div class="avatar-grid" id="avatar-gallery"></div>
+    </div>
+  </div>
 
-    <!-- MAIN -->
-    <main id="main-content" class="hidden">
-
-        <!-- KURZUSOK -->
-        <div id="page-courses" class="page active">
-            <h1>Kurzusok</h1>
-            <p class="subtitle">Válassz egy kurzust a tanuláshoz.</p>
-            <div class="search-bar">
-                <input type="search" id="course-search" placeholder="Kurzus keresése..." oninput="filterCourses()">
-            </div>
-            <div id="courses-grid" class="course-grid"><div style="color:var(--muted);">Betöltés...</div></div>
+  <!-- PUBLIKUS PROFIL -->
+  <div id="page-pub-profile" class="page">
+    <button class="btn btn-outline btn-sm" style="margin-bottom:20px;" id="pub-back-btn" onclick="history.back()">← Vissza</button>
+    <div class="pub-profile-header">
+      <img class="pub-avatar" id="pub-avatar" src="" alt="">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;" id="pub-name"></div>
+        <div id="pub-badges" style="margin:6px 0;display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <div class="pub-stats">
+          <div class="pub-stat"><div class="pub-stat-num" id="pub-followers">0</div><div class="pub-stat-label">Követő</div></div>
+          <div class="pub-stat"><div class="pub-stat-num" id="pub-courses">0</div><div class="pub-stat-label">Kurzus</div></div>
         </div>
+        <button class="btn btn-primary btn-sm" id="pub-subscribe-btn" style="margin-top:12px;" onclick="toggleSubscribe()"></button>
+      </div>
+    </div>
+    <h2>Kurzusai</h2>
+    <div id="pub-courses-grid" class="course-grid"></div>
+  </div>
 
-        <!-- VIDEÓ LEJÁTSZÓ -->
-        <div id="page-player" class="page">
-            <button class="btn btn-outline btn-sm" style="margin-bottom:20px;" onclick="showPage('courses')">← Vissza</button>
-            <h1 id="player-title"></h1>
-            <p class="subtitle" id="player-lesson-name"></p>
-            <div class="video-wrapper"><div id="yt-player"></div></div>
-            <p id="player-status" style="color:var(--muted);font-size:14px;margin-bottom:12px;">Nézd végig a videót!</p>
-            <button id="next-lesson-btn" class="btn btn-accent btn-sm" disabled onclick="nextLesson()">Következő lecke →</button>
-            <div style="margin-top:24px;max-width:860px;">
-                <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
-                    <span>Haladás</span><span id="player-pct">0%</span>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-            </div>
-            <div id="lesson-list-player" style="margin-top:24px;"></div>
+  <!-- PREMIUM -->
+  <div id="page-premium" class="page">
+    <h1>💎 Premium</h1>
+    <p class="subtitle">Aktiválj prémium hozzáférést kóddal, vagy ajándékozz egyet.</p>
+
+    <div id="premium-active-banner" class="hidden premium-banner">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--premium);">💎 Aktív Premium előfizetés</div>
+        <div id="premium-expiry" style="font-size:13px;color:var(--muted);margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="admin-card" style="max-width:480px;">
+      <h2>Premium aktiválása</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Add meg a premium kódodat az aktiváláshoz (1 hónap).</p>
+      <div class="form-group"><label>Premium kód</label><input type="text" id="premium-code-input" placeholder="Add meg a kódot..."></div>
+      <button class="btn btn-premium btn-sm" onclick="activatePremium()">💎 Aktiválás</button>
+      <p class="success-msg" id="premium-msg"></p>
+      <p class="err-msg" id="premium-err"></p>
+    </div>
+
+    <div class="admin-card" style="max-width:480px;">
+      <h2>🎁 Premium ajándékozás</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">Van ajándék premium kódod? Aktiváld itt – 1 hónap premium jár érte.</p>
+      <div class="form-group"><label>Ajándék kód</label><input type="text" id="gift-code-input" placeholder="Add meg az ajándék kódot..."></div>
+      <button class="btn btn-accent btn-sm" onclick="activateGift()">🎁 Beváltás</button>
+      <p class="success-msg" id="gift-msg"></p>
+      <p class="err-msg" id="gift-err"></p>
+    </div>
+
+    <div class="admin-card" style="max-width:480px;">
+      <h2>💎 Premium előnyök</h2>
+      <ul style="color:var(--muted);font-size:14px;line-height:2;list-style:none;">
+        <li>✅ Prémium kurzusok elérése</li>
+        <li>✅ Saját kurzusok készítése</li>
+        <li>✅ Premium badge a profilon</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- KURZUS LÉTREHOZÁSA -->
+  <div id="page-create-course" class="page">
+    <h1>Új kurzus létrehozása</h1>
+    <p class="subtitle">Töltsd ki az adatokat, add hozzá a leckéket és a kvíz kérdéseket.</p>
+    <div class="admin-card" style="max-width:720px;">
+      <div class="form-row">
+        <div class="form-group"><label>Kurzus neve *</label><input type="text" id="nc-title" placeholder="pl. Python alapok"></div>
+        <div class="form-group"><label>Emoji / ikon</label><input type="text" id="nc-emoji" placeholder="🐍" maxlength="2" value="🎓"></div>
+      </div>
+      <div class="form-group"><label>Leírás</label><textarea id="nc-desc" rows="3" placeholder="Mire tanítja meg a hallgatót?"></textarea></div>
+      <div class="form-group">
+        <label>Kurzus típusa</label>
+        <select id="nc-type">
+          <option value="free">Ingyenes</option>
+          <option value="premium">💎 Premium (csak premium felhasználóknak)</option>
+        </select>
+      </div>
+
+      <h2>Leckék</h2>
+      <ul class="lesson-list-editor" id="lesson-list-editor"></ul>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:24px;">
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0;"><label>Lecke neve</label><input type="text" id="nl-title" placeholder="pl. Változók"></div>
+          <div class="form-group" style="margin-bottom:0;"><label>YouTube Video ID</label><input type="text" id="nl-video" placeholder="pl. LXb3EKWsInQ"></div>
         </div>
+        <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="addLesson()">+ Lecke hozzáadása</button>
+      </div>
 
-        <!-- PROFIL -->
-        <div id="page-profile" class="page">
-            <h1>Profil</h1>
-            <div class="admin-card" style="max-width:560px;">
-                <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
-                    <img id="profile-avatar" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--primary);object-fit:cover;" src="" alt="">
-                    <div>
-                        <div id="profile-name" style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;"></div>
-                        <div id="profile-email" style="color:var(--muted);font-size:13px;"></div>
-                        <div id="profile-role" style="margin-top:4px;"></div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Megjelenített név módosítása</label>
-                    <input type="text" id="profile-new-name" placeholder="Új név">
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="saveProfileName()">Mentés</button>
-                <p class="success-msg" id="profile-save-msg"></p>
-            </div>
-
-            <div class="admin-card" style="max-width:560px;">
-                <h2>🖼️ Avatar galéria</h2>
-                <p style="color:var(--muted);font-size:14px;margin-bottom:4px;">Kattints egy avatarra a profilképed megváltoztatásához. Kurzusok elvégzésével újabb avatarokat oldhatsz fel!</p>
-                <div class="avatar-grid" id="avatar-gallery"></div>
-            </div>
+      <h2>📝 Kvíz kérdések</h2>
+      <ul class="lesson-list-editor" id="quiz-list-editor"></ul>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:24px;">
+        <div class="form-group"><label>Típus</label>
+          <select id="nq-type" onchange="toggleQuizType()">
+            <option value="multi">Feleletválasztós (A/B/C/D)</option>
+            <option value="truefalse">Igaz / Hamis</option>
+          </select>
         </div>
-
-        <!-- KURZUS LÉTREHOZÁSA -->
-        <div id="page-create-course" class="page">
-            <h1>Új kurzus létrehozása</h1>
-            <p class="subtitle">Töltsd ki az adatokat, add hozzá a leckéket és a kvíz kérdéseket.</p>
-            <div class="admin-card" style="max-width:720px;">
-                <div class="form-row">
-                    <div class="form-group"><label>Kurzus neve *</label><input type="text" id="nc-title" placeholder="pl. Python alapok"></div>
-                    <div class="form-group"><label>Emoji / ikon</label><input type="text" id="nc-emoji" placeholder="🐍" maxlength="2" value="🎓"></div>
-                </div>
-                <div class="form-group"><label>Leírás</label><textarea id="nc-desc" rows="3" placeholder="Mire tanítja meg a hallgatót?"></textarea></div>
-
-                <h2>Leckék</h2>
-                <ul class="lesson-list-editor" id="lesson-list-editor"></ul>
-                <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:24px;">
-                    <div class="form-row">
-                        <div class="form-group" style="margin-bottom:0;"><label>Lecke neve</label><input type="text" id="nl-title" placeholder="pl. Változók és adattípusok"></div>
-                        <div class="form-group" style="margin-bottom:0;"><label>YouTube Video ID</label><input type="text" id="nl-video" placeholder="pl. LXb3EKWsInQ"></div>
-                    </div>
-                    <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="addLesson()">+ Lecke hozzáadása</button>
-                </div>
-
-                <h2>📝 Kvíz kérdések <span style="font-size:13px;color:var(--muted);font-weight:400;">(a kurzus végén jelenik meg)</span></h2>
-                <ul class="lesson-list-editor" id="quiz-list-editor"></ul>
-                <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:24px;">
-                    <div class="form-group"><label>Kérdés típusa</label>
-                        <select id="nq-type" onchange="toggleQuizType()">
-                            <option value="multi">Feleletválasztós (A/B/C/D)</option>
-                            <option value="truefalse">Igaz / Hamis</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Kérdés szövege</label><input type="text" id="nq-question" placeholder="pl. Mi a Python típusa?"></div>
-                    <div id="nq-multi-area">
-                        <div class="form-row">
-                            <div class="form-group"><label>A) válasz</label><input type="text" id="nq-a" placeholder=""></div>
-                            <div class="form-group"><label>B) válasz</label><input type="text" id="nq-b" placeholder=""></div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group"><label>C) válasz</label><input type="text" id="nq-c" placeholder=""></div>
-                            <div class="form-group"><label>D) válasz (opcionális)</label><input type="text" id="nq-d" placeholder=""></div>
-                        </div>
-                        <div class="form-group"><label>Helyes válasz</label>
-                            <select id="nq-correct">
-                                <option value="0">A)</option><option value="1">B)</option>
-                                <option value="2">C)</option><option value="3">D)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div id="nq-tf-area" class="hidden">
-                        <div class="form-group"><label>Helyes válasz</label>
-                            <select id="nq-tf-correct"><option value="true">Igaz</option><option value="false">Hamis</option></select>
-                        </div>
-                    </div>
-                    <div class="form-group"><label>Magyarázat (opcionális, helyes/helytelen válasz után jelenik meg)</label><input type="text" id="nq-explain" placeholder="pl. A Python egy interpretált nyelv."></div>
-                    <button class="btn btn-outline btn-sm" onclick="addQuizQuestion()">+ Kérdés hozzáadása</button>
-                </div>
-
-                <div class="admin-card" style="border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.04);margin-bottom:0;">
-                    <h2 style="color:var(--tester);">🏆 Elvégzési jutalom avatar</h2>
-                    <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">A kurzus sikeres elvégzésekor a felhasználó megkapja ezt az avatart a gyűjteményébe.</p>
-                    <div class="form-row">
-                        <div class="form-group" style="margin-bottom:0;">
-                            <label>Avatar kép URL (opcionális)</label>
-                            <input type="text" id="nc-badge-url" placeholder="https://... (jpg/png/gif)">
-                        </div>
-                        <div class="form-group" style="margin-bottom:0;">
-                            <label>Avatar neve *</label>
-                            <input type="text" id="nc-badge-name" placeholder="pl. Python Mester">
-                        </div>
-                    </div>
-                    <p style="font-size:12px;color:var(--muted);margin-top:8px;">Ha nem adsz meg URL-t, egy emoji alapú avatar generálódik automatikusan a kurzus emojijából.</p>
-                </div>
-
-                <button class="btn btn-primary" style="margin-top:16px;" onclick="saveCourse()">💾 Kurzus mentése</button>
-                <p class="success-msg" id="nc-msg"></p>
-            </div>
+        <div class="form-group"><label>Kérdés *</label><input type="text" id="nq-question" placeholder="pl. Mi a Python típusa?"></div>
+        <div id="nq-multi-area">
+          <div class="form-row">
+            <div class="form-group"><label>A)</label><input type="text" id="nq-a"></div>
+            <div class="form-group"><label>B)</label><input type="text" id="nq-b"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>C)</label><input type="text" id="nq-c"></div>
+            <div class="form-group"><label>D) (opcionális)</label><input type="text" id="nq-d"></div>
+          </div>
+          <div class="form-group"><label>Helyes válasz</label>
+            <select id="nq-correct"><option value="0">A)</option><option value="1">B)</option><option value="2">C)</option><option value="3">D)</option></select>
+          </div>
         </div>
-
-        <!-- KURZUSOK KEZELÉSE -->
-        <div id="page-manage-courses" class="page">
-            <h1>Kurzusok kezelése</h1>
-            <p class="subtitle">Meglévő kurzusok és törlése.</p>
-            <div id="manage-courses-list"></div>
+        <div id="nq-tf-area" class="hidden">
+          <div class="form-group"><label>Helyes válasz</label>
+            <select id="nq-tf-correct"><option value="true">Igaz</option><option value="false">Hamis</option></select>
+          </div>
         </div>
+        <div class="form-group"><label>Magyarázat (opcionális)</label><input type="text" id="nq-explain" placeholder="pl. A Python interpretált nyelv."></div>
+        <button class="btn btn-outline btn-sm" onclick="addQuizQuestion()">+ Kérdés hozzáadása</button>
+      </div>
 
-        <!-- FELHASZNÁLÓK -->
-        <div id="page-manage-users" class="page">
-            <h1>Felhasználók</h1>
-            <p class="subtitle">Regisztrált felhasználók listája.</p>
-            <div class="admin-card">
-                <table>
-                    <thead><tr><th>Név</th><th>E-mail</th><th>Szerep</th><th>Regisztrálva</th></tr></thead>
-                    <tbody id="users-table-body"><tr><td colspan="4" style="color:var(--muted);">Betöltés...</td></tr></tbody>
-                </table>
-            </div>
+      <div class="admin-card" style="border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.04);margin-bottom:0;">
+        <h2 style="color:var(--tester);">🏆 Elvégzési jutalom avatar</h2>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0;"><label>Avatar kép URL</label><input type="text" id="nc-badge-url" placeholder="https://..."></div>
+          <div class="form-group" style="margin-bottom:0;"><label>Avatar neve</label><input type="text" id="nc-badge-name" placeholder="pl. Python Mester"></div>
         </div>
+      </div>
 
-    </main>
+      <button class="btn btn-primary" style="margin-top:16px;" onclick="saveCourse()">💾 Kurzus mentése</button>
+      <p class="success-msg" id="nc-msg"></p>
+    </div>
+  </div>
+
+  <!-- KURZUSAIM -->
+  <div id="page-manage-courses" class="page">
+    <h1>Kurzusaim</h1>
+    <p class="subtitle">Általad létrehozott kurzusok.</p>
+    <div id="manage-courses-list"></div>
+  </div>
+
+  <!-- FELHASZNÁLÓK (teszter) -->
+  <div id="page-manage-users" class="page">
+    <h1>Felhasználók</h1>
+    <p class="subtitle">Regisztrált felhasználók listája.</p>
+    <div class="admin-card">
+      <table>
+        <thead><tr><th>Név</th><th>E-mail</th><th>Szerep</th><th>Premium</th><th>Regisztrálva</th></tr></thead>
+        <tbody id="users-table-body"><tr><td colspan="5" style="color:var(--muted);">Betöltés...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc, query, orderBy, where, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const TESTER_CODE = "201309042444";
-const PASS_THRESHOLD = 0.6; // 60% kell az átmenéshez
+const TESTER_CODE    = "201309042444";
+const PREMIUM_CODE   = "2013090424442444";
+const GIFT_CODE      = "20130904244424442444";
+const PASS_THRESHOLD = 0.6;
+
 const firebaseConfig = {
-    apiKey: "AIzaSyA9qoO7HEw7mxmAW8ienO-5Uh3qlOKpCIo",
-    authDomain: "marci-tanfolyam.firebaseapp.com",
-    projectId: "marci-tanfolyam",
-    storageBucket: "marci-tanfolyam.firebasestorage.app",
-    messagingSenderId: "1030798395423",
-    appId: "1:1030798395423:web:44e99837acd08499e02d2a"
+  apiKey:"AIzaSyA9qoO7HEw7mxmAW8ienO-5Uh3qlOKpCIo",
+  authDomain:"marci-tanfolyam.firebaseapp.com",
+  projectId:"marci-tanfolyam",
+  storageBucket:"marci-tanfolyam.firebasestorage.app",
+  messagingSenderId:"1030798395423",
+  appId:"1:1030798395423:web:44e99837acd08499e02d2a"
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
+const db   = getFirestore(app);
+const gp   = new GoogleAuthProvider();
 
 // ── STATE ──
-let currentUser = null, isTester = false, uiReady = false;
-let userAvatars = []; // [{id, name, url, emoji, source:'default'|'earned'}]
-let selectedAvatarId = null;
-let pendingLessons = [], pendingQuiz = [];
-let ytPlayer = null, ytReady = false;
-let currentCourse = null, currentLessonIdx = 0;
-let allCourses = [], userProgress = {};
-
-// ── QUIZ STATE ──
-let quizQuestions = [], quizIdx = 0, quizScore = 0, quizAnswered = false;
+let currentUser=null, isTester=false, isPremium=false, uiReady=false;
+let canCreate=false; // tester OR premium
+let pendingLessons=[], pendingQuiz=[];
+let ytPlayer=null, ytReady=false;
+let currentCourse=null, currentLessonIdx=0;
+let allCourses=[], userProgress={};
+let userAvatars=[], selectedAvatarId=null;
+let quizQuestions=[], quizIdx=0, quizScore=0, quizAnswered=false;
+let viewingUserId=null; // for public profile
 
 // ── AUTH ──
-window.switchTab = (tab) => {
-    document.getElementById('tab-login').classList.toggle('hidden', tab !== 'login');
-    document.getElementById('tab-register').classList.toggle('hidden', tab !== 'register');
-    document.getElementById('modal-title').innerText = tab === 'login' ? 'Bejelentkezés' : 'Regisztráció';
-    document.getElementById('tab-btn-login').classList.toggle('active', tab === 'login');
-    document.getElementById('tab-btn-register').classList.toggle('active', tab !== 'login');
-    setErr('');
+window.switchTab = t => {
+  ['login','register'].forEach(x => document.getElementById('tab-'+x).classList.toggle('hidden', x!==t));
+  document.getElementById('modal-title').innerText = t==='login' ? 'Bejelentkezés' : 'Regisztráció';
+  document.getElementById('tab-btn-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-btn-register').classList.toggle('active', t!=='login');
+  setErr('');
 };
 window.toggleTesterArea = () => document.getElementById('tester-code-area').classList.toggle('hidden');
-function setErr(msg) { document.getElementById('auth-error').innerText = msg; }
+function setErr(m){ document.getElementById('auth-error').innerText=m; }
 
 async function setupUI(user, userData) {
-    uiReady = true; currentUser = user; isTester = userData.role === 'tester';
-    document.getElementById('auth-modal').classList.add('hidden');
-    document.getElementById('sidebar').classList.remove('hidden');
-    document.getElementById('main-content').classList.remove('hidden');
-    document.getElementById('user-chip-area').classList.remove('hidden');
-    const avatar = user.photoURL || `https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`;
-    document.getElementById('header-avatar').src = avatar;
-    document.getElementById('header-name').innerText = userData.name || user.displayName || user.email;
-    document.getElementById('header-tester-badge').classList.toggle('hidden', !isTester);
-    document.getElementById('profile-avatar').src = avatar;
-    document.getElementById('profile-name').innerText = userData.name || user.displayName || 'Névtelen';
-    document.getElementById('profile-email').innerText = user.email;
-    document.getElementById('profile-role').innerHTML = isTester ? '<span class="tag tag-tester">🔑 Teszter</span>' : '<span class="tag tag-user">Felhasználó</span>';
-    if (isTester) document.getElementById('tester-nav').classList.remove('hidden');
-    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-        const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
-    }
-    await loadUserProgress();
-    await loadUserAvatars();
-    await loadCourses();
-    renderAvatarGallery();
+  uiReady=true; currentUser=user;
+  isTester  = userData.role==='tester';
+  isPremium = checkPremium(userData);
+  canCreate = isTester || isPremium;
+
+  document.getElementById('auth-modal').classList.add('hidden');
+  ['sidebar','main-content','user-chip-area'].forEach(id=>document.getElementById(id).classList.remove('hidden'));
+
+  const avatar = user.photoURL||`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user.uid}`;
+  document.getElementById('header-avatar').src = avatar;
+  document.getElementById('header-name').innerText = userData.name||user.displayName||user.email;
+  document.getElementById('header-tester-badge').classList.toggle('hidden',!isTester);
+  document.getElementById('header-premium-badge').classList.toggle('hidden',!isPremium);
+
+  document.getElementById('profile-avatar').src = avatar;
+  document.getElementById('profile-name').innerText = userData.name||user.displayName||'Névtelen';
+  document.getElementById('profile-email').innerText = user.email;
+
+  const roles = [];
+  if(isTester) roles.push('<span class="tag tag-tester">🔑 Teszter</span>');
+  if(isPremium) roles.push('<span class="tag tag-premium">💎 Premium</span>');
+  if(!roles.length) roles.push('<span class="tag tag-user">Felhasználó</span>');
+  document.getElementById('profile-role').innerHTML = roles.join(' ');
+
+  // Sidebar creator nav
+  if(canCreate) {
+    document.getElementById('creator-nav').classList.remove('hidden');
+    document.getElementById('creator-nav-label').innerHTML = isTester
+      ? '<div class="tester-glow">🔑 Teszter panel</div>'
+      : '<div class="premium-glow">💎 Premium alkotó</div>';
+  }
+  if(isTester) document.getElementById('tester-nav').classList.remove('hidden');
+
+  // Premium page banner
+  if(isPremium) {
+    document.getElementById('premium-active-banner').classList.remove('hidden');
+    const exp = userData.premiumUntil ? new Date(userData.premiumUntil).toLocaleDateString('hu-HU') : '—';
+    document.getElementById('premium-expiry').innerText = `Lejár: ${exp}`;
+  }
+
+  if(!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+    const t=document.createElement('script'); t.src="https://www.youtube.com/iframe_api"; document.head.appendChild(t);
+  }
+
+  await Promise.all([loadUserProgress(), loadUserAvatars()]);
+  await loadCourses();
+  renderAvatarGallery();
+  updateProfileStats();
+}
+
+function checkPremium(userData) {
+  if(!userData.premiumUntil) return false;
+  return new Date(userData.premiumUntil) > new Date();
 }
 
 window.doLogin = async () => {
-    const email = document.getElementById('login-email').value.trim();
-    const pass = document.getElementById('login-pass').value;
-    if (!email || !pass) { setErr('Töltsd ki a mezőket!'); return; }
-    try { await signInWithEmailAndPassword(auth, email, pass); }
-    catch(e) { setErr(e.code === 'auth/invalid-credential' ? 'Hibás e-mail vagy jelszó.' : e.message); }
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){setErr('Töltsd ki a mezőket!');return;}
+  try { await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e){ setErr(e.code==='auth/invalid-credential'?'Hibás e-mail vagy jelszó.':e.message); }
 };
 
 window.doRegister = async () => {
-    const name = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const pass = document.getElementById('reg-pass').value;
-    const code = document.getElementById('tester-code').value.trim();
-    if (!name || !email || !pass) { setErr('Töltsd ki az összes mezőt!'); return; }
-    if (pass.length < 6) { setErr('A jelszó legalább 6 karakter!'); return; }
-    if (code && code !== TESTER_CODE) { setErr('Érvénytelen teszter kód!'); return; }
-    const role = code === TESTER_CODE ? 'tester' : 'user';
-    try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
-        const userData = { name, email, role, createdAt: new Date().toISOString() };
-        await setDoc(doc(db, "users", cred.user.uid), userData);
-        await setupUI(cred.user, userData);
-    } catch(e) { setErr(e.code === 'auth/email-already-in-use' ? 'Ez az e-mail már regisztrált.' : e.message); }
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  const code=document.getElementById('tester-code').value.trim();
+  if(!name||!email||!pass){setErr('Töltsd ki az összes mezőt!');return;}
+  if(pass.length<6){setErr('A jelszó legalább 6 karakter!');return;}
+  if(code && code!==TESTER_CODE){setErr('Érvénytelen teszter kód!');return;}
+  const role=code===TESTER_CODE?'tester':'user';
+  try {
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    await updateProfile(cred.user,{displayName:name});
+    const userData={name,email,role,createdAt:new Date().toISOString()};
+    await setDoc(doc(db,"users",cred.user.uid),userData);
+    await setupUI(cred.user,userData);
+  } catch(e){ setErr(e.code==='auth/email-already-in-use'?'Ez az e-mail már regisztrált.':e.message); }
 };
 
 window.doGoogle = async () => {
-    try {
-        const cred = await signInWithPopup(auth, provider);
-        const ref = doc(db, "users", cred.user.uid);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) await setDoc(ref, { name: cred.user.displayName || cred.user.email, email: cred.user.email, role: 'user', createdAt: new Date().toISOString() });
-    } catch(e) { setErr(e.message); }
+  try {
+    const cred=await signInWithPopup(auth,gp);
+    const ref=doc(db,"users",cred.user.uid);
+    const snap=await getDoc(ref);
+    if(!snap.exists()) await setDoc(ref,{name:cred.user.displayName||cred.user.email,email:cred.user.email,role:'user',createdAt:new Date().toISOString()});
+  } catch(e){ setErr(e.message); }
 };
 
 window.doLogout = async () => { await signOut(auth); location.reload(); };
 
-onAuthStateChanged(auth, async (user) => {
-    if (uiReady) return;
-    if (user) {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        const userData = snap.exists() ? snap.data() : { role: 'user', name: user.displayName || user.email };
-        await setupUI(user, userData);
-    } else {
-        document.getElementById('auth-modal').classList.remove('hidden');
-        ['sidebar','main-content','user-chip-area'].forEach(id => document.getElementById(id).classList.add('hidden'));
-    }
+onAuthStateChanged(auth, async user => {
+  if(uiReady) return;
+  if(user) {
+    const snap=await getDoc(doc(db,"users",user.uid));
+    const ud=snap.exists()?snap.data():{role:'user',name:user.displayName||user.email};
+    await setupUI(user,ud);
+  } else {
+    document.getElementById('auth-modal').classList.remove('hidden');
+    ['sidebar','main-content','user-chip-area'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+  }
 });
 
-// ── NAVIGATION ──
-window.showPage = (page) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    const nav = document.getElementById('nav-' + page);
-    if (nav) nav.classList.add('active');
-    if (page === 'manage-users') loadUsers();
-    if (page === 'manage-courses') loadManageCourses();
+// ── PREMIUM ──
+window.activatePremium = async () => {
+  const code=document.getElementById('premium-code-input').value.trim();
+  document.getElementById('premium-err').innerText='';
+  document.getElementById('premium-msg').innerText='';
+  if(code!==PREMIUM_CODE && code!==GIFT_CODE){
+    document.getElementById('premium-err').innerText='Érvénytelen kód!'; return;
+  }
+  await grantPremium();
+  document.getElementById('premium-msg').innerText='✅ Premium aktiválva! (1 hónap)';
+  document.getElementById('premium-code-input').value='';
 };
 
-// ── USER PROGRESS (Firestore-ban tároljuk) ──
+window.activateGift = async () => {
+  const code=document.getElementById('gift-code-input').value.trim();
+  document.getElementById('gift-err').innerText='';
+  document.getElementById('gift-msg').innerText='';
+  if(code!==GIFT_CODE && code!==PREMIUM_CODE){
+    document.getElementById('gift-err').innerText='Érvénytelen ajándék kód!'; return;
+  }
+  await grantPremium();
+  document.getElementById('gift-msg').innerText='🎁 Ajándék premium beváltva! (1 hónap)';
+  document.getElementById('gift-code-input').value='';
+};
+
+async function grantPremium() {
+  const until=new Date();
+  until.setMonth(until.getMonth()+1);
+  const untilStr=until.toISOString();
+  await updateDoc(doc(db,"users",currentUser.uid),{premiumUntil:untilStr});
+  isPremium=true; canCreate=true;
+  document.getElementById('header-premium-badge').classList.remove('hidden');
+  document.getElementById('premium-active-banner').classList.remove('hidden');
+  document.getElementById('premium-expiry').innerText=`Lejár: ${until.toLocaleDateString('hu-HU')}`;
+  document.getElementById('profile-role').innerHTML+=' <span class="tag tag-premium">💎 Premium</span>';
+  document.getElementById('creator-nav').classList.remove('hidden');
+  if(!isTester) document.getElementById('creator-nav-label').innerHTML='<div class="premium-glow">💎 Premium alkotó</div>';
+  // unlock premium badge
+  await unlockBadge({courseId:'premium_badge',name:'Premium tag',url:null,emoji:'💎'});
+}
+
+// ── NAVIGATION ──
+window.showPage = page => {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const nav=document.getElementById('nav-'+page);
+  if(nav) nav.classList.add('active');
+  if(page==='manage-users') loadUsers();
+  if(page==='manage-courses') loadManageCourses();
+  if(page==='profile') renderAvatarGallery();
+};
+
+// ── PROGRESS ──
 async function loadUserProgress() {
-    try {
-        const snap = await getDoc(doc(db, "progress", currentUser.uid));
-        userProgress = snap.exists() ? snap.data() : {};
-    } catch(e) { userProgress = {}; }
+  try{const s=await getDoc(doc(db,"progress",currentUser.uid));userProgress=s.exists()?s.data():{};}catch{userProgress={};}
+}
+async function saveProgress(courseId,lessonIdx) {
+  const prev=userProgress[courseId]||{completedLessons:0,done:false};
+  if(lessonIdx+1>prev.completedLessons){
+    userProgress[courseId]={...prev,completedLessons:lessonIdx+1};
+    try{await setDoc(doc(db,"progress",currentUser.uid),userProgress,{merge:true});}catch{}
+  }
+}
+async function markCourseComplete(courseId) {
+  userProgress[courseId]={...(userProgress[courseId]||{}),done:true,completedLessons:currentCourse.lessons.length};
+  try{await setDoc(doc(db,"progress",currentUser.uid),userProgress,{merge:true});}catch{}
+}
+async function resetCourseProgress(courseId) {
+  userProgress[courseId]={completedLessons:0,done:false};
+  try{await setDoc(doc(db,"progress",currentUser.uid),userProgress,{merge:true});}catch{}
 }
 
 // ── AVATARS ──
 async function loadUserAvatars() {
-    try {
-        const snap = await getDoc(doc(db, "avatars", currentUser.uid));
-        const data = snap.exists() ? snap.data() : {};
-        userAvatars = data.collection || [];
-        selectedAvatarId = data.selected || null;
-
-        // Always ensure default avatar exists
-        const hasDefault = userAvatars.find(a => a.id === 'default');
-        if (!hasDefault) {
-            const defaultAvatar = {
-                id: 'default',
-                name: currentUser.displayName ? currentUser.displayName + ' avatarja' : 'Alap avatar',
-                url: currentUser.photoURL || null,
-                emoji: currentUser.photoURL ? null : '🧑',
-                source: 'default'
-            };
-            userAvatars.unshift(defaultAvatar);
-            if (!selectedAvatarId) selectedAvatarId = 'default';
-        }
-        if (!selectedAvatarId) selectedAvatarId = userAvatars[0]?.id || 'default';
-    } catch(e) {
-        userAvatars = [{id:'default', name:'Alap avatar', url: currentUser.photoURL||null, emoji:'🧑', source:'default'}];
-        selectedAvatarId = 'default';
+  try{
+    const s=await getDoc(doc(db,"avatars",currentUser.uid));
+    const d=s.exists()?s.data():{};
+    userAvatars=d.collection||[];
+    selectedAvatarId=d.selected||null;
+    if(!userAvatars.find(a=>a.id==='default')){
+      userAvatars.unshift({id:'default',name:'Alap avatar',url:currentUser.photoURL||null,emoji:'🧑',source:'default'});
     }
-    updateAvatarUI();
+    if(!selectedAvatarId) selectedAvatarId='default';
+  }catch{
+    userAvatars=[{id:'default',name:'Alap avatar',url:currentUser.photoURL||null,emoji:'🧑',source:'default'}];
+    selectedAvatarId='default';
+  }
+  updateAvatarUI();
+}
+async function saveUserAvatars(){
+  try{await setDoc(doc(db,"avatars",currentUser.uid),{collection:userAvatars,selected:selectedAvatarId});}catch{}
+}
+function updateAvatarUI(){
+  const av=userAvatars.find(a=>a.id===selectedAvatarId)||userAvatars[0];
+  if(!av) return;
+  const src=av.url||(av.emoji?`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.emoji}`:`https://api.dicebear.com/7.x/pixel-art/svg?seed=${currentUser.uid}`);
+  ['header-avatar','profile-avatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=src;});
+}
+function renderAvatarGallery(){
+  const grid=document.getElementById('avatar-gallery');
+  if(!grid) return;
+  grid.innerHTML='';
+  userAvatars.forEach(av=>{
+    const item=document.createElement('div');
+    item.className='avatar-item'+(av.id===selectedAvatarId?' selected':'');
+    const vis=document.createElement('div'); vis.className='avatar-visual';
+    const src=av.url||(av.emoji?`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.emoji}`:`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.id}`);
+    const img=document.createElement('img'); img.src=src; img.alt=av.name;
+    vis.appendChild(img);
+    const lbl=document.createElement('div'); lbl.className='avatar-label'; lbl.innerText=av.name;
+    item.appendChild(vis); item.appendChild(lbl);
+    item.onclick=()=>selectAvatar(av.id);
+    grid.appendChild(item);
+  });
+}
+window.selectAvatar=async id=>{
+  selectedAvatarId=id;
+  await saveUserAvatars();
+  updateAvatarUI();
+  renderAvatarGallery();
+  document.getElementById('profile-save-msg').innerText='✅ Avatar beállítva!';
+  setTimeout(()=>document.getElementById('profile-save-msg').innerText='',2000);
+};
+async function unlockBadge(badge){
+  if(userAvatars.find(a=>a.id===badge.courseId)) return;
+  const nav={id:badge.courseId,name:badge.name,url:badge.url||null,emoji:badge.emoji||'🏆',source:'earned'};
+  userAvatars.push(nav);
+  await saveUserAvatars();
+  renderAvatarGallery();
+  showBadgePopup(nav);
+}
+function showBadgePopup(av){
+  const popup=document.getElementById('badge-popup');
+  const vis=document.getElementById('badge-popup-visual');
+  vis.innerHTML='';
+  const src=av.url||(av.emoji?`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.emoji}`:'');
+  if(src){const img=document.createElement('img');img.src=src;vis.appendChild(img);}else{vis.innerText=av.emoji||'🏆';}
+  document.getElementById('badge-popup-name').innerText=av.name;
+  popup.classList.remove('hidden');
+  setTimeout(()=>popup.classList.add('hidden'),5000);
 }
 
-async function saveUserAvatars() {
-    try {
-        await setDoc(doc(db, "avatars", currentUser.uid), {
-            collection: userAvatars,
-            selected: selectedAvatarId
-        });
-    } catch(e) {}
+// ── SUBSCRIBE / FOLLOWERS ──
+async function updateProfileStats(){
+  try{
+    const snap=await getDoc(doc(db,"followers",currentUser.uid));
+    const followers=(snap.exists()&&snap.data().followers)?snap.data().followers.length:0;
+    document.getElementById('profile-stats').innerHTML=`
+      <div class="pub-stat"><div class="pub-stat-num">${followers}</div><div class="pub-stat-label">Követő</div></div>`;
+    // Subscriber badge
+    if(followers>=10) await unlockBadge({courseId:'sub_10',name:'10 követő',url:null,emoji:'🌟'});
+    if(followers>=50) await unlockBadge({courseId:'sub_50',name:'50 követő',url:null,emoji:'⭐'});
+  }catch{}
 }
 
-function getSelectedAvatarSrc() {
-    const av = userAvatars.find(a => a.id === selectedAvatarId) || userAvatars[0];
-    return av ? (av.url || null) : null;
-}
+// ── PUBLIC PROFILE ──
+window.openProfile = async uid => {
+  if(uid===currentUser.uid){showPage('profile');return;}
+  viewingUserId=uid;
+  showPage('pub-profile');
+  document.getElementById('pub-name').innerText='Betöltés...';
+  document.getElementById('pub-courses-grid').innerHTML='';
 
-function getSelectedAvatarEmoji() {
-    const av = userAvatars.find(a => a.id === selectedAvatarId) || userAvatars[0];
-    return av ? (av.emoji || '🧑') : '🧑';
-}
+  // User data
+  const usnap=await getDoc(doc(db,"users",uid));
+  const ud=usnap.exists()?usnap.data():{name:'Névtelen'};
 
-function updateAvatarUI() {
-    const av = userAvatars.find(a => a.id === selectedAvatarId) || userAvatars[0];
-    if (!av) return;
-    const src = av.url;
-    const emoji = av.emoji;
-    ['header-avatar', 'profile-avatar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (src) { el.src = src; el.style.display = ''; }
-        else { el.src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${emoji||currentUser.uid}`; }
-    });
-}
+  // Avatar
+  const avSnap=await getDoc(doc(db,"avatars",uid));
+  let avatarSrc=ud.photoURL||`https://api.dicebear.com/7.x/pixel-art/svg?seed=${uid}`;
+  if(avSnap.exists()){
+    const avd=avSnap.data();
+    const sel=avd.selected;
+    const col=avd.collection||[];
+    const av=col.find(a=>a.id===sel)||col[0];
+    if(av) avatarSrc=av.url||(av.emoji?`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.emoji}`:avatarSrc);
+  }
+  document.getElementById('pub-avatar').src=avatarSrc;
+  document.getElementById('pub-name').innerText=ud.name||'Névtelen';
 
-function renderAvatarGallery() {
-    const grid = document.getElementById('avatar-gallery');
-    if (!grid) return;
-    grid.innerHTML = '';
-    userAvatars.forEach(av => {
-        const item = document.createElement('div');
-        item.className = 'avatar-item' + (av.id === selectedAvatarId ? ' selected' : '');
-        const visual = document.createElement('div');
-        visual.className = 'avatar-visual';
-        if (av.url) {
-            const img = document.createElement('img');
-            img.src = av.url; img.alt = av.name;
-            img.onerror = () => { img.style.display='none'; visual.innerText = av.emoji || '🧑'; };
-            visual.appendChild(img);
-        } else {
-            visual.innerText = av.emoji || '🧑';
-        }
-        const label = document.createElement('div');
-        label.className = 'avatar-label';
-        label.innerText = av.name;
-        item.appendChild(visual);
-        item.appendChild(label);
-        item.onclick = () => selectAvatar(av.id);
-        grid.appendChild(item);
-    });
-}
+  // Badges
+  const badges=[];
+  if(ud.role==='tester') badges.push('<span class="tag tag-tester">🔑 Teszter</span>');
+  if(checkPremium(ud)) badges.push('<span class="tag tag-premium">💎 Premium</span>');
+  document.getElementById('pub-badges').innerHTML=badges.join(' ');
 
-window.selectAvatar = async (id) => {
-    selectedAvatarId = id;
-    await saveUserAvatars();
-    updateAvatarUI();
-    renderAvatarGallery();
-    document.getElementById('profile-save-msg').innerText = '✅ Avatar beállítva!';
-    setTimeout(() => document.getElementById('profile-save-msg').innerText = '', 2000);
+  // Followers
+  const fsnap=await getDoc(doc(db,"followers",uid));
+  const followers=(fsnap.exists()&&fsnap.data().followers)?fsnap.data().followers:[]; 
+  document.getElementById('pub-followers').innerText=followers.length;
+  const isFollowing=followers.includes(currentUser.uid);
+  document.getElementById('pub-subscribe-btn').innerText=isFollowing?'✓ Követed':'+ Követés';
+  document.getElementById('pub-subscribe-btn').className='btn '+(isFollowing?'btn-outline':'btn-primary')+' btn-sm';
+
+  // Courses by this user
+  const csnap=await getDocs(query(collection(db,"courses"),where("createdBy","==",uid)));
+  document.getElementById('pub-courses').innerText=csnap.size;
+  const grid=document.getElementById('pub-courses-grid');
+  grid.innerHTML='';
+  csnap.forEach(d=>{
+    const c={id:d.id,...d.data()};
+    if(c.type==='premium'&&!isPremium) return;
+    const card=makeCourseCard(c,null,null);
+    grid.appendChild(card);
+  });
+  if(grid.innerHTML==='') grid.innerHTML='<div style="color:var(--muted);">Nincs megjeleníthető kurzus.</div>';
 };
 
-async function unlockBadge(badge) {
-    // badge: { name, url, emoji, courseId }
-    const alreadyHas = userAvatars.find(a => a.id === badge.courseId);
-    if (alreadyHas) return;
-    const newAvatar = {
-        id: badge.courseId,
-        name: badge.name,
-        url: badge.url || null,
-        emoji: badge.emoji || '🏆',
-        source: 'earned'
-    };
-    userAvatars.push(newAvatar);
-    await saveUserAvatars();
-    renderAvatarGallery();
-    showBadgePopup(newAvatar);
-}
-
-function showBadgePopup(av) {
-    const popup = document.getElementById('badge-popup');
-    const visual = document.getElementById('badge-popup-visual');
-    visual.innerHTML = '';
-    if (av.url) {
-        const img = document.createElement('img');
-        img.src = av.url; img.alt = av.name;
-        img.onerror = () => { img.remove(); visual.innerText = av.emoji || '🏆'; };
-        visual.appendChild(img);
-    } else {
-        visual.innerText = av.emoji || '🏆';
-    }
-    document.getElementById('badge-popup-name').innerText = av.name;
-    popup.classList.remove('hidden');
-    popup.classList.add('badge-popup-anim');
-    setTimeout(() => { popup.classList.add('hidden'); popup.classList.remove('badge-popup-anim'); }, 5000);
-}
-
-async function saveProgress(courseId, lessonIdx) {
-    const prev = userProgress[courseId] || { completedLessons: 0, done: false };
-    if (lessonIdx + 1 > prev.completedLessons) {
-        userProgress[courseId] = { ...prev, completedLessons: lessonIdx + 1 };
-        try { await setDoc(doc(db, "progress", currentUser.uid), userProgress, { merge: true }); } catch(e){}
-    }
-}
-
-async function markCourseComplete(courseId) {
-    userProgress[courseId] = { ...(userProgress[courseId]||{}), done: true, completedLessons: currentCourse.lessons.length };
-    try { await setDoc(doc(db, "progress", currentUser.uid), userProgress, { merge: true }); } catch(e){}
-}
-
-async function resetCourseProgress(courseId) {
-    userProgress[courseId] = { completedLessons: 0, done: false };
-    try { await setDoc(doc(db, "progress", currentUser.uid), userProgress, { merge: true }); } catch(e){}
-}
+window.toggleSubscribe = async () => {
+  if(!viewingUserId) return;
+  const ref=doc(db,"followers",viewingUserId);
+  const snap=await getDoc(ref);
+  const followers=(snap.exists()&&snap.data().followers)?snap.data().followers:[];
+  const isFollowing=followers.includes(currentUser.uid);
+  if(isFollowing){
+    await setDoc(ref,{followers:arrayRemove(currentUser.uid)},{merge:true});
+    document.getElementById('pub-subscribe-btn').innerText='+ Követés';
+    document.getElementById('pub-subscribe-btn').className='btn btn-primary btn-sm';
+    document.getElementById('pub-followers').innerText=Math.max(0,parseInt(document.getElementById('pub-followers').innerText)-1);
+  } else {
+    await setDoc(ref,{followers:arrayUnion(currentUser.uid)},{merge:true});
+    document.getElementById('pub-subscribe-btn').innerText='✓ Követed';
+    document.getElementById('pub-subscribe-btn').className='btn btn-outline btn-sm';
+    document.getElementById('pub-followers').innerText=parseInt(document.getElementById('pub-followers').innerText)+1;
+    // Give subscriber badge to the profile owner
+    // (they'll see it next login via updateProfileStats)
+  }
+};
 
 // ── COURSES ──
-async function loadCourses() {
-    const grid = document.getElementById('courses-grid');
-    grid.innerHTML = '';
-    try {
-        const snap = await getDocs(query(collection(db, "courses"), orderBy("createdAt", "desc")));
-        allCourses = [];
-        snap.forEach(d => allCourses.push({ id: d.id, ...d.data() }));
-        renderCourseGrid(allCourses);
-    } catch(e) { grid.innerHTML = `<div style="color:#f87171;">Hiba: ${e.message}</div>`; }
-}
-
-function renderCourseGrid(courses) {
-    const grid = document.getElementById('courses-grid');
-    grid.innerHTML = '';
-    if (courses.length === 0) { grid.innerHTML = '<div style="color:var(--muted);font-size:14px;">Nincs találat.</div>'; return; }
-    courses.forEach(c => {
-        const prog = userProgress[c.id] || { completedLessons: 0, done: false };
-        const total = (c.lessons || []).length;
-        const pct = total > 0 ? Math.round((prog.completedLessons / total) * 100) : 0;
-        const done = prog.done;
-        const card = document.createElement('div');
-        card.className = 'course-card';
-        card.innerHTML = `
-            <div class="course-thumb">${done ? '✅' : (c.emoji || '🎓')}</div>
-            <div class="course-info">
-                <div class="course-title">${c.title}</div>
-                <div class="course-meta">${total} lecke • ${c.description || ''}</div>
-            </div>
-            <div class="course-progress-wrap">
-                <div class="course-progress-label"><span>${done ? 'Elvégezve!' : (pct > 0 ? 'Folyamatban' : 'Nem kezdted el')}</span><span>${pct}%</span></div>
-                <div class="progress-bar"><div class="progress-fill ${done ? 'complete' : ''}" style="width:${pct}%"></div></div>
-            </div>
-            <div class="course-actions">
-                <button class="btn btn-primary btn-sm" onclick="openCourse('${c.id}')">${pct > 0 ? 'Folytatás' : 'Megnyitás'}</button>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-window.filterCourses = () => {
-    const q = document.getElementById('course-search').value.toLowerCase();
-    const filtered = allCourses.filter(c =>
-        c.title.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
-    );
-    renderCourseGrid(filtered);
-};
-
-window.openCourse = async (courseId) => {
-    const snap = await getDoc(doc(db, "courses", courseId));
-    if (!snap.exists()) return;
-    currentCourse = { id: snap.id, ...snap.data() };
-    currentLessonIdx = 0;
-    showPage('player');
-    document.getElementById('player-title').innerText = currentCourse.title;
-    renderLessonListPlayer();
-    loadLesson(0);
-};
-
-function loadLesson(idx) {
-    const lesson = currentCourse.lessons[idx];
-    if (!lesson) return;
-    currentLessonIdx = idx;
-    saveProgress(currentCourse.id, idx);
-    document.getElementById('player-lesson-name').innerText = `${idx+1}. lecke: ${lesson.title}`;
-    document.getElementById('player-status').innerText = 'Nézd végig a videót!';
-    document.getElementById('next-lesson-btn').disabled = true;
-    updatePlayerProgress(idx);
-    renderLessonListPlayer();
-    if (ytReady) {
-        if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') ytPlayer.loadVideoById(lesson.videoId);
-        else createPlayer(lesson.videoId);
-    }
-}
-
-function updatePlayerProgress(idx) {
-    const total = currentCourse.lessons.length;
-    const pct = Math.round((idx / total) * 100);
-    document.getElementById('progress-fill').style.width = pct + '%';
-    document.getElementById('player-pct').innerText = pct + '%';
-}
-
-function createPlayer(videoId) {
-    document.getElementById('yt-player').innerHTML = '';
-    ytPlayer = new YT.Player('yt-player', {
-        videoId, width: '100%', height: '100%',
-        playerVars: { enablejsapi: 1, origin: location.origin, rel: 0 },
-        events: {
-            onError: () => {
-                document.getElementById('player-status').innerText = '⚠️ Ez a videó nem játszható le beágyazva.';
-                document.getElementById('next-lesson-btn').disabled = false;
-            },
-            onStateChange: (e) => {
-                if (e.data === YT.PlayerState.ENDED) {
-                    document.getElementById('next-lesson-btn').disabled = false;
-                    document.getElementById('player-status').innerText = '✅ Kész! Mehet tovább.';
-                    const pct = Math.round(((currentLessonIdx+1) / currentCourse.lessons.length) * 100);
-                    document.getElementById('progress-fill').style.width = pct + '%';
-                    document.getElementById('player-pct').innerText = pct + '%';
-                }
-            }
-        }
-    });
-}
-
-window.onYouTubeIframeAPIReady = () => {
-    ytReady = true;
-    if (currentCourse && currentCourse.lessons) createPlayer(currentCourse.lessons[currentLessonIdx].videoId);
-};
-
-function renderLessonListPlayer() {
-    const el = document.getElementById('lesson-list-player');
-    el.innerHTML = '<h2 style="margin-bottom:12px;">Leckék</h2>';
-    (currentCourse.lessons || []).forEach((l, i) => {
-        const prog = userProgress[currentCourse.id] || {};
-        const done = i < (prog.completedLessons || 0);
-        const btn = document.createElement('button');
-        btn.className = 'nav-item' + (i === currentLessonIdx ? ' active' : '');
-        btn.innerHTML = `<span class="lesson-num">${done ? '✓' : (i+1)}</span> ${l.title}`;
-        btn.style.color = done ? 'var(--accent)' : '';
-        btn.onclick = () => loadLesson(i);
-        el.appendChild(btn);
-    });
-}
-
-window.nextLesson = () => {
-    if (currentLessonIdx + 1 < currentCourse.lessons.length) {
-        loadLesson(currentLessonIdx + 1);
-    } else {
-        // Utolsó lecke vége → kvíz vagy befejezés
-        if (currentCourse.quiz && currentCourse.quiz.length > 0) {
-            startQuiz(currentCourse.quiz);
-        } else {
-            finishCourse();
-        }
-    }
-};
-
-async function finishCourse() {
-    await markCourseComplete(currentCourse.id);
-    document.getElementById('player-status').innerText = '🎉 Gratulálok! Elvégezted a kurzust!';
-    document.getElementById('next-lesson-btn').disabled = true;
-    document.getElementById('progress-fill').style.width = '100%';
-    document.getElementById('player-pct').innerText = '100%';
+async function loadCourses(){
+  const grid=document.getElementById('courses-grid');
+  grid.innerHTML='';
+  try{
+    const snap=await getDocs(query(collection(db,"courses"),orderBy("createdAt","desc")));
+    allCourses=[];
+    snap.forEach(d=>allCourses.push({id:d.id,...d.data()}));
     renderCourseGrid(allCourses);
-    // Unlock badge if course has one
-    if (currentCourse.badge && currentCourse.badge.name) {
-        await unlockBadge({ ...currentCourse.badge, courseId: currentCourse.id });
+  }catch(e){grid.innerHTML=`<div style="color:#f87171;">Hiba: ${e.message}</div>`;}
+}
+
+// Cache creator info
+const creatorCache={};
+async function getCreatorInfo(uid){
+  if(creatorCache[uid]) return creatorCache[uid];
+  try{
+    const s=await getDoc(doc(db,"users",uid));
+    const ud=s.exists()?s.data():{name:'Ismeretlen'};
+    const avSnap=await getDoc(doc(db,"avatars",uid));
+    let src=ud.photoURL||`https://api.dicebear.com/7.x/pixel-art/svg?seed=${uid}`;
+    if(avSnap.exists()){
+      const avd=avSnap.data();const col=avd.collection||[];const av=col.find(a=>a.id===avd.selected)||col[0];
+      if(av) src=av.url||(av.emoji?`https://api.dicebear.com/7.x/pixel-art/svg?seed=${av.emoji}`:src);
     }
+    creatorCache[uid]={name:ud.name||'Ismeretlen',avatar:src,uid};
+    return creatorCache[uid];
+  }catch{return {name:'Ismeretlen',avatar:'',uid};}
+}
+
+function makeCourseCard(c, prog, creatorInfo){
+  const isPrem=c.type==='premium';
+  const locked=isPrem&&!isPremium;
+  const pct=prog?Math.round((prog.completedLessons/(c.lessons||[]).length)*100):0;
+  const done=prog?.done||false;
+
+  const card=document.createElement('div');
+  card.className='course-card'+(isPrem?' premium-card':'');
+
+  const likes=(c.likes||0);
+  const liked=(c.likedBy||[]).includes(currentUser.uid);
+
+  card.innerHTML=`
+    <div class="course-thumb">
+      ${done?'✅':(c.emoji||'🎓')}
+      ${isPrem?'<div class="premium-lock">💎 Premium</div>':''}
+    </div>
+    <div class="course-info">
+      <div class="course-title">${c.title}</div>
+      <div class="course-meta">${(c.lessons||[]).length} lecke • ${c.description||''}</div>
+      <div class="course-creator" id="creator-${c.id}">
+        <div style="width:18px;height:18px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+        <span>Betöltés...</span>
+      </div>
+    </div>
+    <div class="course-progress-wrap">
+      <div class="course-progress-label">
+        <span>${done?'Elvégezve!':(pct>0?'Folyamatban':'Nem kezdted el')}</span>
+        <span>${pct}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill ${done?'complete':''}" style="width:${pct}%"></div></div>
+    </div>
+    <div class="course-footer">
+      <button class="like-btn ${liked?'liked':''}" onclick="toggleLike('${c.id}',this)">
+        ❤️ <span>${likes}</span>
+      </button>
+      ${locked
+        ? '<button class="btn btn-premium btn-sm" onclick="showPage(\'premium\')">💎 Premium</button>'
+        : `<button class="btn btn-primary btn-sm" onclick="openCourse('${c.id}')">${pct>0?'Folytatás':'Megnyitás'}</button>`
+      }
+    </div>
+  `;
+
+  // Load creator async
+  if(c.createdBy) {
+    getCreatorInfo(c.createdBy).then(info=>{
+      const el=document.getElementById(`creator-${c.id}`);
+      if(el) el.innerHTML=`<img src="${info.avatar}" onerror="this.style.display='none'" style="width:18px;height:18px;border-radius:50%;object-fit:cover;"><span onclick="openProfile('${info.uid}')" style="cursor:pointer;">${info.name}</span>`;
+    });
+  }
+
+  return card;
+}
+
+function renderCourseGrid(courses){
+  const grid=document.getElementById('courses-grid');
+  grid.innerHTML='';
+  if(!courses.length){grid.innerHTML='<div style="color:var(--muted);">Nincs találat.</div>';return;}
+  courses.forEach(c=>{
+    const prog=userProgress[c.id]||null;
+    grid.appendChild(makeCourseCard(c,prog,null));
+  });
+}
+
+window.filterCourses=()=>{
+  const q=document.getElementById('course-search').value.toLowerCase();
+  renderCourseGrid(allCourses.filter(c=>c.title.toLowerCase().includes(q)||(c.description||'').toLowerCase().includes(q)));
+};
+
+// ── LIKES ──
+window.toggleLike=async(courseId,btn)=>{
+  const ref=doc(db,"courses",courseId);
+  const snap=await getDoc(ref);
+  if(!snap.exists()) return;
+  const liked=(snap.data().likedBy||[]).includes(currentUser.uid);
+  const span=btn.querySelector('span');
+  if(liked){
+    await updateDoc(ref,{likes:increment(-1),likedBy:arrayRemove(currentUser.uid)});
+    btn.classList.remove('liked');
+    span.innerText=parseInt(span.innerText)-1;
+  }else{
+    await updateDoc(ref,{likes:increment(1),likedBy:arrayUnion(currentUser.uid)});
+    btn.classList.add('liked');
+    span.innerText=parseInt(span.innerText)+1;
+  }
+};
+
+// ── OPEN COURSE ──
+window.openCourse=async courseId=>{
+  const snap=await getDoc(doc(db,"courses",courseId));
+  if(!snap.exists()) return;
+  currentCourse={id:snap.id,...snap.data()};
+  if(currentCourse.type==='premium'&&!isPremium){showPage('premium');return;}
+  currentLessonIdx=0;
+  showPage('player');
+  document.getElementById('player-title').innerText=currentCourse.title;
+  renderLessonListPlayer();
+  loadLesson(0);
+};
+
+function loadLesson(idx){
+  const lesson=currentCourse.lessons[idx];
+  if(!lesson) return;
+  currentLessonIdx=idx;
+  saveProgress(currentCourse.id,idx);
+  document.getElementById('player-lesson-name').innerText=`${idx+1}. lecke: ${lesson.title}`;
+  document.getElementById('player-status').innerText='Nézd végig a videót!';
+  document.getElementById('next-lesson-btn').disabled=true;
+  updatePlayerProgress(idx);
+  renderLessonListPlayer();
+  if(ytReady){
+    if(ytPlayer&&typeof ytPlayer.loadVideoById==='function') ytPlayer.loadVideoById(lesson.videoId);
+    else createPlayer(lesson.videoId);
+  }
+}
+
+function updatePlayerProgress(idx){
+  const total=currentCourse.lessons.length;
+  const pct=Math.round((idx/total)*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('player-pct').innerText=pct+'%';
+}
+
+function createPlayer(videoId){
+  document.getElementById('yt-player').innerHTML='';
+  ytPlayer=new YT.Player('yt-player',{
+    videoId,width:'100%',height:'100%',
+    playerVars:{enablejsapi:1,origin:location.origin,rel:0},
+    events:{
+      onError:()=>{
+        document.getElementById('player-status').innerText='⚠️ Ez a videó nem játszható le beágyazva.';
+        document.getElementById('next-lesson-btn').disabled=false;
+      },
+      onStateChange:e=>{
+        if(e.data===YT.PlayerState.ENDED){
+          document.getElementById('next-lesson-btn').disabled=false;
+          document.getElementById('player-status').innerText='✅ Kész! Mehet tovább.';
+          const pct=Math.round(((currentLessonIdx+1)/currentCourse.lessons.length)*100);
+          document.getElementById('progress-fill').style.width=pct+'%';
+          document.getElementById('player-pct').innerText=pct+'%';
+        }
+      }
+    }
+  });
+}
+
+window.onYouTubeIframeAPIReady=()=>{
+  ytReady=true;
+  if(currentCourse&&currentCourse.lessons) createPlayer(currentCourse.lessons[currentLessonIdx].videoId);
+};
+
+function renderLessonListPlayer(){
+  const el=document.getElementById('lesson-list-player');
+  el.innerHTML='<h2 style="margin-bottom:12px;">Leckék</h2>';
+  (currentCourse.lessons||[]).forEach((l,i)=>{
+    const done=i<((userProgress[currentCourse.id]||{}).completedLessons||0);
+    const btn=document.createElement('button');
+    btn.className='nav-item'+(i===currentLessonIdx?' active':'');
+    btn.innerHTML=`<span class="lesson-num">${done?'✓':(i+1)}</span> ${l.title}`;
+    btn.style.color=done?'var(--accent)':'';
+    btn.onclick=()=>loadLesson(i);
+    el.appendChild(btn);
+  });
+}
+
+window.nextLesson=()=>{
+  if(currentLessonIdx+1<currentCourse.lessons.length) loadLesson(currentLessonIdx+1);
+  else if(currentCourse.quiz&&currentCourse.quiz.length>0) startQuiz(currentCourse.quiz);
+  else finishCourse();
+};
+
+async function finishCourse(){
+  await markCourseComplete(currentCourse.id);
+  document.getElementById('player-status').innerText='🎉 Gratulálok! Elvégezted a kurzust!';
+  document.getElementById('next-lesson-btn').disabled=true;
+  document.getElementById('progress-fill').style.width='100%';
+  document.getElementById('player-pct').innerText='100%';
+  renderCourseGrid(allCourses);
+  if(currentCourse.badge&&currentCourse.badge.name) await unlockBadge({...currentCourse.badge,courseId:currentCourse.id});
 }
 
 // ── QUIZ ──
-function startQuiz(questions) {
-    quizQuestions = questions;
-    quizIdx = 0; quizScore = 0; quizAnswered = false;
-    document.getElementById('quiz-overlay').classList.remove('hidden');
-    document.getElementById('quiz-result-screen').classList.add('hidden');
-    document.getElementById('quiz-question-screen').classList.remove('hidden');
-    renderQuizQuestion();
+function startQuiz(questions){
+  quizQuestions=questions;quizIdx=0;quizScore=0;quizAnswered=false;
+  document.getElementById('quiz-overlay').classList.remove('hidden');
+  document.getElementById('quiz-result-screen').classList.add('hidden');
+  document.getElementById('quiz-question-screen').classList.remove('hidden');
+  renderQuizQuestion();
 }
 
-function renderQuizQuestion() {
-    const q = quizQuestions[quizIdx];
-    document.getElementById('quiz-counter').innerText = `${quizIdx+1} / ${quizQuestions.length}`;
-    document.getElementById('quiz-progress-fill').style.width = (quizIdx / quizQuestions.length * 100) + '%';
-    document.getElementById('quiz-question-text').innerText = q.question;
-    document.getElementById('quiz-feedback').classList.add('hidden');
-    document.getElementById('quiz-next-btn').style.display = 'none';
-    quizAnswered = false;
+function renderQuizQuestion(){
+  const q=quizQuestions[quizIdx];
+  document.getElementById('quiz-counter').innerText=`${quizIdx+1} / ${quizQuestions.length}`;
+  document.getElementById('quiz-progress-fill').style.width=(quizIdx/quizQuestions.length*100)+'%';
+  document.getElementById('quiz-question-text').innerText=q.question;
+  document.getElementById('quiz-feedback').classList.add('hidden');
+  document.getElementById('quiz-next-btn').style.display='none';
+  quizAnswered=false;
+  const opts=document.getElementById('quiz-options');
+  opts.innerHTML='';
+  const labels=['A','B','C','D'];
+  const options=q.type==='truefalse'
+    ?[{text:'Igaz',val:'true'},{text:'Hamis',val:'false'}]
+    :q.options.map((o,i)=>({text:o,val:String(i)})).filter(o=>o.text);
+  options.forEach((o,i)=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-option';
+    btn.innerHTML=`<span class="opt-label">${q.type==='truefalse'?(i===0?'✓':'✗'):labels[i]}</span>${o.text}`;
+    btn.onclick=()=>answerQuiz(o.val,btn,options);
+    opts.appendChild(btn);
+  });
+}
 
-    const opts = document.getElementById('quiz-options');
-    opts.innerHTML = '';
-    const labels = ['A', 'B', 'C', 'D'];
+window.answerQuiz=(val,btn,options)=>{
+  if(quizAnswered) return;
+  quizAnswered=true;
+  const q=quizQuestions[quizIdx];
+  const correctVal=q.type==='truefalse'?q.correct:String(q.correct);
+  const isCorrect=val===correctVal;
+  if(isCorrect) quizScore++;
+  document.querySelectorAll('.quiz-option').forEach((b,i)=>{
+    b.disabled=true;
+    if(options[i].val===correctVal) b.classList.add('correct');
+    else if(b===btn&&!isCorrect) b.classList.add('wrong');
+  });
+  const fb=document.getElementById('quiz-feedback');
+  fb.className='quiz-feedback '+(isCorrect?'correct':'wrong');
+  fb.innerText=(isCorrect?'✅ Helyes!':'❌ Helytelen.')+(q.explanation?' '+q.explanation:'');
+  fb.classList.remove('hidden');
+  document.getElementById('quiz-next-btn').style.display='block';
+  document.getElementById('quiz-next-btn').innerText=quizIdx+1<quizQuestions.length?'Következő kérdés →':'Eredmény megtekintése';
+};
 
-    let options = [];
-    if (q.type === 'truefalse') {
-        options = [{ text: 'Igaz', val: 'true' }, { text: 'Hamis', val: 'false' }];
-    } else {
-        options = q.options.map((o, i) => ({ text: o, val: String(i) })).filter(o => o.text);
-    }
+window.quizNext=()=>{
+  quizIdx++;
+  if(quizIdx<quizQuestions.length) renderQuizQuestion();
+  else showQuizResult();
+};
 
-    options.forEach((o, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.innerHTML = `<span class="opt-label">${q.type === 'truefalse' ? (i === 0 ? '✓' : '✗') : labels[i]}</span> ${o.text}`;
-        btn.onclick = () => answerQuiz(o.val, btn, options);
-        opts.appendChild(btn);
+function showQuizResult(){
+  document.getElementById('quiz-question-screen').classList.add('hidden');
+  document.getElementById('quiz-result-screen').classList.remove('hidden');
+  const total=quizQuestions.length;
+  const pass=(quizScore/total)>=PASS_THRESHOLD;
+  const circle=document.getElementById('quiz-score-circle');
+  circle.className='quiz-score-circle '+(pass?'pass':'fail');
+  document.getElementById('quiz-score-num').innerText=`${quizScore}/${total}`;
+  document.getElementById('quiz-result-title').innerText=pass?'🎉 Átmentél!':'😔 Nem sikerült';
+  document.getElementById('quiz-result-desc').innerText=pass
+    ?`${Math.round(quizScore/total*100)}% – Gratulálok!`
+    :`${Math.round(quizScore/total*100)}% – Legalább ${Math.round(PASS_THRESHOLD*100)}% kell. Kurzus újraindul.`;
+  const btn=document.getElementById('quiz-result-btn');
+  btn.innerText=pass?'Vissza a kurzusokhoz':'🔄 Újrakezdés';
+  btn.className='btn '+(pass?'btn-accent':'btn-primary');
+}
+
+window.quizResultAction=async()=>{
+  document.getElementById('quiz-overlay').classList.add('hidden');
+  const pass=(quizScore/quizQuestions.length)>=PASS_THRESHOLD;
+  if(pass){await finishCourse();showPage('courses');}
+  else{
+    await resetCourseProgress(currentCourse.id);
+    loadLesson(0);renderLessonListPlayer();updatePlayerProgress(0);
+    document.getElementById('player-status').innerText='Nézd végig a videót!';
+    document.getElementById('next-lesson-btn').disabled=true;
+    renderCourseGrid(allCourses);
+  }
+};
+
+// ── TESTER: QUIZ EDITOR ──
+window.toggleQuizType=()=>{
+  const t=document.getElementById('nq-type').value;
+  document.getElementById('nq-multi-area').classList.toggle('hidden',t!=='multi');
+  document.getElementById('nq-tf-area').classList.toggle('hidden',t!=='truefalse');
+};
+window.addQuizQuestion=()=>{
+  const type=document.getElementById('nq-type').value;
+  const question=document.getElementById('nq-question').value.trim();
+  const explanation=document.getElementById('nq-explain').value.trim();
+  if(!question){alert('Add meg a kérdés szövegét!');return;}
+  let qObj={type,question,explanation};
+  if(type==='multi'){
+    const a=document.getElementById('nq-a').value.trim();
+    const b=document.getElementById('nq-b').value.trim();
+    const c=document.getElementById('nq-c').value.trim();
+    const d=document.getElementById('nq-d').value.trim();
+    if(!a||!b||!c){alert('Legalább A, B, C válasz kell!');return;}
+    qObj.options=[a,b,c,d].filter(Boolean);
+    qObj.correct=parseInt(document.getElementById('nq-correct').value);
+  }else{
+    qObj.correct=document.getElementById('nq-tf-correct').value;
+  }
+  pendingQuiz.push(qObj);
+  ['nq-question','nq-a','nq-b','nq-c','nq-d','nq-explain'].forEach(id=>document.getElementById(id).value='');
+  renderQuizEditor();
+};
+window.removeQuizQuestion=i=>{pendingQuiz.splice(i,1);renderQuizEditor();};
+function renderQuizEditor(){
+  const ul=document.getElementById('quiz-list-editor');ul.innerHTML='';
+  pendingQuiz.forEach((q,i)=>{
+    const li=document.createElement('li');li.className='lesson-item';
+    li.innerHTML=`<span class="lesson-num">${i+1}</span><span>${q.question} <span style="color:var(--muted);font-size:12px;">[${q.type==='truefalse'?'I/H':'A-D'}]</span></span><button class="btn btn-danger btn-sm" onclick="removeQuizQuestion(${i})">✕</button>`;
+    ul.appendChild(li);
+  });
+}
+
+// ── CREATOR: KURZUS LÉTREHOZÁS ──
+window.addLesson=()=>{
+  const title=document.getElementById('nl-title').value.trim();
+  const videoId=document.getElementById('nl-video').value.trim();
+  if(!title||!videoId){alert('Add meg a lecke nevét és Video ID-t!');return;}
+  pendingLessons.push({title,videoId});
+  document.getElementById('nl-title').value='';document.getElementById('nl-video').value='';
+  renderLessonEditor();
+};
+window.removeLesson=i=>{pendingLessons.splice(i,1);renderLessonEditor();};
+function renderLessonEditor(){
+  const ul=document.getElementById('lesson-list-editor');ul.innerHTML='';
+  pendingLessons.forEach((l,i)=>{
+    const li=document.createElement('li');li.className='lesson-item';
+    li.innerHTML=`<span class="lesson-num">${i+1}</span><span>${l.title} <span style="color:var(--muted);font-size:12px;">[${l.videoId}]</span></span><button class="btn btn-danger btn-sm" onclick="removeLesson(${i})">✕</button>`;
+    ul.appendChild(li);
+  });
+}
+
+window.saveCourse=async()=>{
+  if(!canCreate){alert('Kurzus létrehozásához Teszter vagy Premium hozzáférés szükséges!');return;}
+  const title=document.getElementById('nc-title').value.trim();
+  const emoji=document.getElementById('nc-emoji').value.trim()||'🎓';
+  const description=document.getElementById('nc-desc').value.trim();
+  const type=document.getElementById('nc-type').value;
+  if(!title){alert('Add meg a kurzus nevét!');return;}
+  if(!pendingLessons.length){alert('Adj hozzá legalább egy leckét!');return;}
+  const badgeUrl=document.getElementById('nc-badge-url').value.trim();
+  const badgeName=document.getElementById('nc-badge-name').value.trim();
+  const badge=badgeName?{name:badgeName,url:badgeUrl||null,emoji}:null;
+  try{
+    await addDoc(collection(db,"courses"),{
+      title,emoji,description,type,
+      lessons:pendingLessons,quiz:pendingQuiz,badge,
+      createdBy:currentUser.uid,
+      likes:0,likedBy:[],
+      createdAt:new Date().toISOString()
     });
+    document.getElementById('nc-msg').innerText='✅ Kurzus mentve!';
+    ['nc-title','nc-desc','nc-badge-url','nc-badge-name'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('nc-emoji').value='🎓';
+    pendingLessons=[];pendingQuiz=[];
+    renderLessonEditor();renderQuizEditor();
+    await loadCourses();
+    setTimeout(()=>document.getElementById('nc-msg').innerText='',3000);
+  }catch(e){alert('Hiba: '+e.message);}
+};
+
+// ── KURZUSAIM ──
+async function loadManageCourses(){
+  const container=document.getElementById('manage-courses-list');
+  container.innerHTML='<div style="color:var(--muted);">Betöltés...</div>';
+  const snap=await getDocs(query(collection(db,"courses"),where("createdBy","==",currentUser.uid),orderBy("createdAt","desc")));
+  container.innerHTML='';
+  if(snap.empty){container.innerHTML='<div style="color:var(--muted);">Még nem hoztál létre kurzust.</div>';return;}
+  snap.forEach(d=>{
+    const c={id:d.id,...d.data()};
+    const card=document.createElement('div');card.className='admin-card';
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;">${c.emoji} ${c.title} ${c.type==='premium'?'<span class="tag tag-premium">💎 Premium</span>':''}</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:2px;">${(c.lessons||[]).length} lecke • ❤️ ${c.likes||0} like</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-sm" onclick="openCourse('${c.id}')">👁</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}',this)">🗑</button>
+        </div>
+      </div>`;
+    container.appendChild(card);
+  });
 }
 
-window.answerQuiz = (val, btn, options) => {
-    if (quizAnswered) return;
-    quizAnswered = true;
-    const q = quizQuestions[quizIdx];
-    const correctVal = q.type === 'truefalse' ? q.correct : String(q.correct);
-    const isCorrect = val === correctVal;
-    if (isCorrect) quizScore++;
+window.deleteCourse=async(id,btn)=>{
+  if(!confirm('Biztosan törlöd?'))return;
+  btn.disabled=true;
+  await deleteDoc(doc(db,"courses",id));
+  loadManageCourses();loadCourses();
+};
 
-    // Mark all options
-    document.querySelectorAll('.quiz-option').forEach((b, i) => {
-        b.disabled = true;
-        const bVal = options[i].val;
-        if (bVal === correctVal) b.classList.add('correct');
-        else if (b === btn && !isCorrect) b.classList.add('wrong');
+// ── TESZTER: FELHASZNÁLÓK ──
+async function loadUsers(){
+  const tbody=document.getElementById('users-table-body');
+  tbody.innerHTML='<tr><td colspan="5" style="color:var(--muted);">Betöltés...</td></tr>';
+  try{
+    const snap=await getDocs(collection(db,"users"));
+    tbody.innerHTML='';
+    snap.forEach(d=>{
+      const u=d.data();
+      const hasPrem=checkPremium(u);
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><span style="cursor:pointer;color:var(--primary);" onclick="openProfile('${d.id}')">${u.name||'—'}</span></td>
+        <td style="color:var(--muted);">${u.email||'—'}</td>
+        <td><span class="tag ${u.role==='tester'?'tag-tester':'tag-user'}">${u.role==='tester'?'🔑 Teszter':'Felhasználó'}</span></td>
+        <td>${hasPrem?'<span class="tag tag-premium">💎 Aktív</span>':'—'}</td>
+        <td style="color:var(--muted);font-size:12px;">${u.createdAt?u.createdAt.slice(0,10):'—'}</td>`;
+      tbody.appendChild(tr);
     });
-
-    const fb = document.getElementById('quiz-feedback');
-    fb.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
-    fb.innerText = isCorrect
-        ? ('✅ Helyes!' + (q.explanation ? ' ' + q.explanation : ''))
-        : ('❌ Helytelen.' + (q.explanation ? ' ' + q.explanation : ''));
-    fb.classList.remove('hidden');
-    document.getElementById('quiz-next-btn').style.display = 'block';
-    document.getElementById('quiz-next-btn').innerText = quizIdx + 1 < quizQuestions.length ? 'Következő kérdés →' : 'Eredmény megtekintése';
-};
-
-window.quizNext = () => {
-    quizIdx++;
-    if (quizIdx < quizQuestions.length) {
-        renderQuizQuestion();
-    } else {
-        showQuizResult();
-    }
-};
-
-function showQuizResult() {
-    document.getElementById('quiz-question-screen').classList.add('hidden');
-    document.getElementById('quiz-result-screen').classList.remove('hidden');
-    const total = quizQuestions.length;
-    const pct = quizScore / total;
-    const pass = pct >= PASS_THRESHOLD;
-    const circle = document.getElementById('quiz-score-circle');
-    circle.className = 'quiz-score-circle ' + (pass ? 'pass' : 'fail');
-    document.getElementById('quiz-score-num').innerText = `${quizScore}/${total}`;
-    document.getElementById('quiz-result-title').innerText = pass ? '🎉 Átmentél!' : '😔 Nem sikerült';
-    document.getElementById('quiz-result-desc').innerText = pass
-        ? `${Math.round(pct*100)}% – Gratulálok, elvégezted a kurzust!`
-        : `${Math.round(pct*100)}% – Legalább ${Math.round(PASS_THRESHOLD*100)}% kell. A kurzus újraindul.`;
-    const btn = document.getElementById('quiz-result-btn');
-    btn.innerText = pass ? 'Vissza a kurzusokhoz' : '🔄 Kurzus újrakezdése';
-    btn.className = 'btn ' + (pass ? 'btn-accent' : 'btn-primary');
+  }catch(e){tbody.innerHTML=`<tr><td colspan="5" style="color:#f87171;">Hiba: ${e.message}</td></tr>`;}
 }
 
-window.quizResultAction = async () => {
-    document.getElementById('quiz-overlay').classList.add('hidden');
-    const total = quizQuestions.length;
-    const pass = (quizScore / total) >= PASS_THRESHOLD;
-    if (pass) {
-        await finishCourse();
-        showPage('courses');
-    } else {
-        // Újrakezdi a kurzust
-        await resetCourseProgress(currentCourse.id);
-        loadLesson(0);
-        renderLessonListPlayer();
-        updatePlayerProgress(0);
-        document.getElementById('player-status').innerText = 'Nézd végig a videót!';
-        document.getElementById('next-lesson-btn').disabled = true;
-        renderCourseGrid(allCourses);
-    }
-};
-
-// ── TESTER: QUIZ KÉRDÉS SZERKESZTŐ ──
-window.toggleQuizType = () => {
-    const type = document.getElementById('nq-type').value;
-    document.getElementById('nq-multi-area').classList.toggle('hidden', type !== 'multi');
-    document.getElementById('nq-tf-area').classList.toggle('hidden', type !== 'truefalse');
-};
-
-window.addQuizQuestion = () => {
-    const type = document.getElementById('nq-type').value;
-    const question = document.getElementById('nq-question').value.trim();
-    const explanation = document.getElementById('nq-explain').value.trim();
-    if (!question) { alert('Add meg a kérdés szövegét!'); return; }
-
-    let qObj = { type, question, explanation };
-    if (type === 'multi') {
-        const a = document.getElementById('nq-a').value.trim();
-        const b = document.getElementById('nq-b').value.trim();
-        const c = document.getElementById('nq-c').value.trim();
-        const d = document.getElementById('nq-d').value.trim();
-        if (!a || !b || !c) { alert('Legalább A, B és C válasz szükséges!'); return; }
-        const correct = parseInt(document.getElementById('nq-correct').value);
-        qObj.options = [a, b, c, d].filter(Boolean);
-        qObj.correct = correct;
-    } else {
-        qObj.correct = document.getElementById('nq-tf-correct').value;
-    }
-
-    pendingQuiz.push(qObj);
-    ['nq-question','nq-a','nq-b','nq-c','nq-d','nq-explain'].forEach(id => document.getElementById(id).value = '');
-    renderQuizEditor();
-};
-
-window.removeQuizQuestion = (i) => { pendingQuiz.splice(i, 1); renderQuizEditor(); };
-
-function renderQuizEditor() {
-    const ul = document.getElementById('quiz-list-editor');
-    ul.innerHTML = '';
-    pendingQuiz.forEach((q, i) => {
-        const li = document.createElement('li');
-        li.className = 'lesson-item';
-        li.innerHTML = `
-            <span class="lesson-num">${i+1}</span>
-            <span>${q.question} <span style="color:var(--muted);font-size:12px;">[${q.type === 'truefalse' ? 'I/H' : 'A-D'}]</span></span>
-            <button class="btn btn-danger btn-sm" onclick="removeQuizQuestion(${i})">✕</button>
-        `;
-        ul.appendChild(li);
-    });
-}
-
-// ── TESTER: KURZUS LÉTREHOZÁS ──
-window.addLesson = () => {
-    const title = document.getElementById('nl-title').value.trim();
-    const videoId = document.getElementById('nl-video').value.trim();
-    if (!title || !videoId) { alert('Add meg a lecke nevét és a Video ID-t!'); return; }
-    pendingLessons.push({ title, videoId });
-    document.getElementById('nl-title').value = '';
-    document.getElementById('nl-video').value = '';
-    renderLessonEditor();
-};
-
-window.removeLesson = (i) => { pendingLessons.splice(i, 1); renderLessonEditor(); };
-
-function renderLessonEditor() {
-    const ul = document.getElementById('lesson-list-editor');
-    ul.innerHTML = '';
-    pendingLessons.forEach((l, i) => {
-        const li = document.createElement('li');
-        li.className = 'lesson-item';
-        li.innerHTML = `<span class="lesson-num">${i+1}</span><span>${l.title} <span style="color:var(--muted);font-size:12px;">[${l.videoId}]</span></span><button class="btn btn-danger btn-sm" onclick="removeLesson(${i})">✕</button>`;
-        ul.appendChild(li);
-    });
-}
-
-window.saveCourse = async () => {
-    const title = document.getElementById('nc-title').value.trim();
-    const emoji = document.getElementById('nc-emoji').value.trim() || '🎓';
-    const description = document.getElementById('nc-desc').value.trim();
-    if (!title) { alert('Add meg a kurzus nevét!'); return; }
-    if (pendingLessons.length === 0) { alert('Adj hozzá legalább egy leckét!'); return; }
-    try {
-        const badgeUrl = document.getElementById('nc-badge-url').value.trim();
-        const badgeName = document.getElementById('nc-badge-name').value.trim();
-        const badge = badgeName ? { name: badgeName, url: badgeUrl || null, emoji: emoji } : null;
-        await addDoc(collection(db, "courses"), {
-            title, emoji, description,
-            lessons: pendingLessons,
-            quiz: pendingQuiz,
-            badge,
-            createdBy: currentUser.uid,
-            createdAt: new Date().toISOString()
-        });
-        document.getElementById('nc-msg').innerText = '✅ Kurzus sikeresen mentve!';
-        ['nc-title','nc-desc','nc-badge-url','nc-badge-name'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('nc-emoji').value = '🎓';
-        pendingLessons = []; pendingQuiz = [];
-        renderLessonEditor(); renderQuizEditor();
-        await loadCourses();
-        setTimeout(() => document.getElementById('nc-msg').innerText = '', 3000);
-    } catch(e) { alert('Hiba: ' + e.message); }
-};
-
-// ── TESTER: KURZUSOK KEZELÉSE ──
-async function loadManageCourses() {
-    const container = document.getElementById('manage-courses-list');
-    container.innerHTML = '<div style="color:var(--muted);">Betöltés...</div>';
-    const snap = await getDocs(query(collection(db, "courses"), orderBy("createdAt", "desc")));
-    container.innerHTML = '';
-    if (snap.empty) { container.innerHTML = '<div style="color:var(--muted);">Nincsenek kurzusok.</div>'; return; }
-    snap.forEach(d => {
-        const c = { id: d.id, ...d.data() };
-        const card = document.createElement('div');
-        card.className = 'admin-card';
-        card.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-                <div>
-                    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;">${c.emoji} ${c.title}</div>
-                    <div style="color:var(--muted);font-size:13px;margin-top:2px;">${(c.lessons||[]).length} lecke • ${(c.quiz||[]).length} kvíz kérdés</div>
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn btn-outline btn-sm" onclick="openCourse('${c.id}')">👁 Megtekintés</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}', this)">🗑 Törlés</button>
-                </div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-window.deleteCourse = async (id, btn) => {
-    if (!confirm('Biztosan törlöd?')) return;
-    btn.disabled = true;
-    await deleteDoc(doc(db, "courses", id));
-    loadManageCourses(); loadCourses();
-};
-
-// ── TESTER: FELHASZNÁLÓK ──
-async function loadUsers() {
-    const tbody = document.getElementById('users-table-body');
-    tbody.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">Betöltés...</td></tr>';
-    try {
-        const snap = await getDocs(collection(db, "users"));
-        tbody.innerHTML = '';
-        snap.forEach(d => {
-            const u = d.data();
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${u.name||'—'}</td><td style="color:var(--muted);">${u.email||'—'}</td><td><span class="tag ${u.role==='tester'?'tag-tester':'tag-user'}">${u.role==='tester'?'🔑 Teszter':'Felhasználó'}</span></td><td style="color:var(--muted);font-size:12px;">${u.createdAt?u.createdAt.slice(0,10):'—'}</td>`;
-            tbody.appendChild(tr);
-        });
-    } catch(e) { tbody.innerHTML = `<tr><td colspan="4" style="color:#f87171;">Hiba: ${e.message}</td></tr>`; }
-}
-
-// ── PROFIL ──
-window.saveProfileName = async () => {
-    const name = document.getElementById('profile-new-name').value.trim();
-    if (!name) return;
-    await updateProfile(auth.currentUser, { displayName: name });
-    await updateDoc(doc(db, "users", currentUser.uid), { name });
-    document.getElementById('profile-name').innerText = name;
-    document.getElementById('header-name').innerText = name;
-    document.getElementById('profile-new-name').value = '';
-    document.getElementById('profile-save-msg').innerText = '✅ Mentve!';
-    setTimeout(() => document.getElementById('profile-save-msg').innerText = '', 2500);
+// ── PROFIL MENTÉS ──
+window.saveProfileName=async()=>{
+  const name=document.getElementById('profile-new-name').value.trim();
+  if(!name) return;
+  await updateProfile(auth.currentUser,{displayName:name});
+  await updateDoc(doc(db,"users",currentUser.uid),{name});
+  document.getElementById('profile-name').innerText=name;
+  document.getElementById('header-name').innerText=name;
+  document.getElementById('profile-new-name').value='';
+  document.getElementById('profile-save-msg').innerText='✅ Mentve!';
+  setTimeout(()=>document.getElementById('profile-save-msg').innerText='',2500);
 };
 </script>
 </body>
